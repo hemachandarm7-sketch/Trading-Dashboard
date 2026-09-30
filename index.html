@@ -182,6 +182,11 @@
       color: var(--success);
     }
 
+    .badge.leverage {
+      background: rgba(255, 152, 0, 0.2);
+      color: #ff9800;
+    }
+
     .pnl-positive {
       color: var(--success);
       font-weight: 700;
@@ -233,7 +238,7 @@
   <div class="container">
     <header>
       <h1>📈 Trading Tracker Dashboard</h1>
-      <p class="subtitle">Auto-updated live trading analytics with exact amounts</p>
+      <p class="subtitle">Leverage Trading Analytics - Real Amounts with 10x Leverage</p>
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
@@ -261,6 +266,7 @@
             <tr>
               <th>Symbol</th>
               <th>Pos</th>
+              <th>Leverage</th>
               <th>Entry</th>
               <th>Exit</th>
               <th>Entry Amt (USDT)</th>
@@ -286,15 +292,18 @@
       {
         symbol: 'RARE/USDT',
         position: 'SHORT',
+        leverage: 10,
         entry: 0.02270,
         exit: 0.01795,
         sl: 0.02398,
         target: 0.01590,
-        qty: 8053,
-        entryAmount: 182.80,
-        exitAmount: 144.51,
+        qty: 8073,
+        notionalEntryAmount: 182.80,
+        notionalExitAmount: 144.51,
+        entryAmount: 18.28,
+        exitAmount: 14.45,
         pnl: 38.261,
-        roi: 20.94,
+        roi: 209.27,
         duration: '1d 21h',
         status: 'WIN',
         closeReason: 'Manual Close'
@@ -302,15 +311,18 @@
       {
         symbol: 'INX/USDT',
         position: 'LONG',
+        leverage: 10,
         entry: 0.5742,
         exit: 0.7360,
         sl: 0,
         target: 0.7360,
         qty: 333,
-        entryAmount: 191.21,
-        exitAmount: 244.89,
+        notionalEntryAmount: 191.21,
+        notionalExitAmount: 244.89,
+        entryAmount: 19.12,
+        exitAmount: 24.49,
         pnl: 53.866,
-        roi: 28.16,
+        roi: 281.54,
         duration: '4d 21h',
         status: 'WIN',
         closeReason: 'TP Hit'
@@ -459,6 +471,7 @@
         <tr>
           <td><strong>${t.symbol}</strong></td>
           <td>${t.position}</td>
+          <td><span class="badge leverage">${t.leverage}x</span></td>
           <td>${t.entry.toFixed(5)}</td>
           <td>${t.exit.toFixed(5)}</td>
           <td><span class="amount-badge">${t.entryAmount.toFixed(2)}</span></td>
