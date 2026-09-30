@@ -263,13 +263,29 @@
       font-weight: 600;
     }
 
-    .amount-badge {
-      background: rgba(100, 150, 255, 0.2);
+    .capital-badge {
+      background: rgba(100, 150, 255, 0.25);
       color: #60a5fa;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .pnl-badge {
+      background: rgba(100, 200, 100, 0.25);
+      color: #60ff60;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .pnl-badge.negative {
+      background: rgba(255, 100, 100, 0.25);
+      color: #ff6060;
     }
 
     .datetime-badge {
@@ -338,12 +354,12 @@
               <th>Symbol</th>
               <th>Pos</th>
               <th>Leverage</th>
+              <th>Capital (USDT)</th>
+              <th>Profit/Loss (USDT)</th>
               <th>Entry</th>
               <th>Exit</th>
-              <th>Real Capital (USDT)</th>
               <th>Notional (USDT)</th>
               <th>Qty</th>
-              <th>P&L (USDT)</th>
               <th>ROI</th>
               <th>Status</th>
               <th>Open Time</th>
@@ -721,12 +737,12 @@
           <td><strong>${t.symbol}</strong></td>
           <td>${t.position}</td>
           <td><span class="badge leverage">${t.leverage}x</span></td>
+          <td><span class="capital-badge">💰 ${t.realCapital.toFixed(2)}</span></td>
+          <td><span class="pnl-badge ${t.pnl > 0 ? '' : 'negative'}">${t.pnl > 0 ? '✅ +' : '❌ '}${Math.abs(t.pnl).toFixed(2)}</span></td>
           <td>${t.entry.toFixed(5)}</td>
           <td>${t.exit.toFixed(5)}</td>
-          <td><span class="amount-badge">${t.realCapital.toFixed(2)}</span></td>
-          <td><span class="amount-badge">${t.notional.toFixed(2)}</span></td>
+          <td>${t.notional.toFixed(2)}</td>
           <td>${t.qty}</td>
-          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
           <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
           <td><span class="badge ${t.status === 'WIN' ? 'win' : 'loss'}">${t.status}</span></td>
           <td><span class="datetime-badge">🕐 ${t.openTime}</span></td>
@@ -745,12 +761,12 @@
           <td><span class="badge leverage">${t.leverage}x</span></td>
           <td>${t.entry.toFixed(5)}</td>
           <td>${t.current.toFixed(5)}</td>
-          <td><span class="amount-badge">${t.realMargin.toFixed(2)}</span></td>
-          <td><span class="amount-badge">${t.size.toFixed(2)}</span></td>
+          <td><span class="capital-badge">💰 ${t.realMargin.toFixed(2)}</span></td>
+          <td>${t.size.toFixed(2)}</td>
           <td>${t.qty}</td>
           <td>${t.liqPrice.toFixed(5)}</td>
           <td>${t.target.toFixed(5)}</td>
-          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
+          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '✅ +' : '❌ '}${Math.abs(t.pnl).toFixed(2)}</td>
           <td class="${t.roe > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roe > 0 ? '+' : ''}${t.roe.toFixed(2)}%</td>
           <td><span class="badge open">📊 ${t.status}</span></td>
           <td><span class="datetime-badge">🕐 ${t.openTime}</span></td>
