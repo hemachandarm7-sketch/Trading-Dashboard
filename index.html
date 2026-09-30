@@ -233,7 +233,7 @@
   <div class="container">
     <header>
       <h1>📈 Trading Tracker Dashboard</h1>
-      <p class="subtitle">Auto-updated live trading analytics with charts</p>
+      <p class="subtitle">Auto-updated live trading analytics with exact amounts</p>
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
@@ -263,8 +263,8 @@
               <th>Pos</th>
               <th>Entry</th>
               <th>Exit</th>
-              <th>Entry Amt</th>
-              <th>Exit Amt</th>
+              <th>Entry Amt (USDT)</th>
+              <th>Exit Amt (USDT)</th>
               <th>Qty</th>
               <th>SL</th>
               <th>Target</th>
@@ -290,11 +290,11 @@
         exit: 0.01795,
         sl: 0.02398,
         target: 0.01590,
-        qty: 8073,
-        entryAmount: 183.26,
-        exitAmount: 144.91,
+        qty: 8053,
+        entryAmount: 182.80,
+        exitAmount: 144.51,
         pnl: 38.261,
-        roi: 209,
+        roi: 20.94,
         duration: '1d 21h',
         status: 'WIN',
         closeReason: 'Manual Close'
@@ -306,9 +306,9 @@
         exit: 0.7360,
         sl: 0,
         target: 0.7360,
-        qty: 54055,
-        entryAmount: 31.05,
-        exitAmount: 39.80,
+        qty: 333,
+        entryAmount: 191.21,
+        exitAmount: 244.89,
         pnl: 53.866,
         roi: 28.16,
         duration: '4d 21h',
@@ -356,7 +356,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Best Trade</div>
-          <div class="stat-value positive">${stats.bestTrade.toFixed(0)}%</div>
+          <div class="stat-value positive">${stats.bestTrade.toFixed(2)}%</div>
         </div>
       `;
     }
