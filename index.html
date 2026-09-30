@@ -272,6 +272,15 @@
       font-weight: 600;
     }
 
+    .datetime-badge {
+      background: rgba(100, 150, 255, 0.15);
+      color: #60a5fa;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 24px;
@@ -337,6 +346,8 @@
               <th>P&L (USDT)</th>
               <th>ROI</th>
               <th>Status</th>
+              <th>Open Time</th>
+              <th>Close Time</th>
               <th>Duration</th>
             </tr>
           </thead>
@@ -364,6 +375,7 @@
               <th>Current P&L (USDT)</th>
               <th>ROE</th>
               <th>Status</th>
+              <th>Open Time</th>
             </tr>
           </thead>
           <tbody id="openTradesBody"></tbody>
@@ -375,7 +387,7 @@
   <script>
     const closedTrades = [
       {
-        symbol: 'RARE/USDT',
+        symbol: 'RARE/USDT #1',
         position: 'SHORT',
         leverage: 10,
         entry: 0.02270,
@@ -387,6 +399,8 @@
         roi: 209.00,
         duration: '1d 21h',
         status: 'WIN',
+        openTime: '28/09/2026 04:44',
+        closeTime: '30/09/2026 01:50',
         date: '2026-09-30'
       },
       {
@@ -402,7 +416,26 @@
         roi: 215.41,
         duration: '4d 21h',
         status: 'WIN',
+        openTime: '23/09/2026 01:08',
+        closeTime: '27/09/2026 22:48',
         date: '2026-09-27'
+      },
+      {
+        symbol: 'RARE/USDT #2',
+        position: 'SHORT',
+        leverage: 10,
+        entry: 0.02250,
+        exit: 0.02416,
+        qty: 5994,
+        realCapital: 13.487,
+        notional: 134.87,
+        pnl: -9.939,
+        roi: -73.71,
+        duration: '16h',
+        status: 'LOSS',
+        openTime: '27/09/2026 12:41',
+        closeTime: '28/09/2026 04:34',
+        date: '2026-09-28'
       }
     ];
 
@@ -421,6 +454,7 @@
         pnl: 11.885,
         roe: 38.56,
         status: 'OPEN',
+        openTime: '30/09/2026',
         date: '2026-09-30'
       },
       {
@@ -437,7 +471,8 @@
         pnl: -2.420,
         roe: -8.99,
         status: 'OPEN',
-        date: '2026-09-30'
+        openTime: '01/10/2026',
+        date: '2026-10-01'
       }
     ];
 
@@ -446,18 +481,18 @@
       const openCount = openTrades.length;
       const totalCount = closedCount + openCount;
       const wins = closedTrades.filter(t => t.roi > 0).length;
+      const losses = closedTrades.filter(t => t.roi < 0).length;
       const winRate = closedCount > 0 ? Math.round((wins / closedCount) * 100) : 0;
       const closedPnL = closedTrades.reduce((sum, t) => sum + t.pnl, 0);
       const openPnL = openTrades.reduce((sum, t) => sum + t.pnl, 0);
       const totalPnL = closedPnL + openPnL;
-      const closedAvgROI = closedCount > 0 ? closedTrades.reduce((sum, t) => sum + t.roi, 0) / closedCount : 0;
       const totalRealCapital = closedTrades.reduce((sum, t) => sum + t.realCapital, 0) + openTrades.reduce((sum, t) => sum + t.realMargin, 0);
 
-      return { totalCount, closedCount, openCount, winRate, closedPnL, openPnL, totalPnL, closedAvgROI, totalRealCapital };
+      return { totalCount, closedCount, openCount, wins, losses, winRate, closedPnL, openPnL, totalPnL, totalRealCapital };
     }
 
     function getTimePeriodStats() {
-      const today = new Date('2026-09-30');
+      const today = new Date('2026-10-01');
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
@@ -468,7 +503,7 @@
       const yearlyTrades = allTrades;
 
       const calcStats = (trades) => {
-        const closedTr = trades.filter(t => t.status === 'WIN');
+        const closedTr = trades.filter(t => t.status === 'WIN' || t.status === 'LOSS');
         const openTr = trades.filter(t => t.status === 'OPEN');
         const pnl = closedTr.reduce((sum, t) => sum + t.pnl, 0) + openTr.reduce((sum, t) => sum + t.pnl, 0);
         const count = trades.length;
@@ -599,7 +634,7 @@
       new Chart(cumulativeCtx, {
         type: 'line',
         data: {
-          labels: closedTrades.map((t, i) => `Trade ${i + 1} (${t.symbol})`),
+          labels: closedTrades.map((t, i) => t.symbol),
           datasets: [{
             label: 'Cumulative P&L (USDT)',
             data: cumulativeValues,
@@ -642,7 +677,9 @@
           <td>${t.qty}</td>
           <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
           <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
-          <td><span class="badge win">${t.status}</span></td>
+          <td><span class="badge ${t.status === 'WIN' ? 'win' : 'loss'}">${t.status}</span></td>
+          <td><span class="datetime-badge">🕐 ${t.openTime}</span></td>
+          <td><span class="datetime-badge">🕐 ${t.closeTime}</span></td>
           <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
         </tr>
       `).join('');
@@ -664,7 +701,8 @@
           <td>${t.target.toFixed(5)}</td>
           <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
           <td class="${t.roe > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roe > 0 ? '+' : ''}${t.roe.toFixed(2)}%</td>
-          <td><span class="badge ${t.pnl > 0 ? 'open' : 'loss'}">📊 ${t.status}</span></td>
+          <td><span class="badge open">📊 ${t.status}</span></td>
+          <td><span class="datetime-badge">🕐 ${t.openTime}</span></td>
         </tr>
       `).join('');
     }
