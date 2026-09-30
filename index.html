@@ -21,6 +21,7 @@
       --success: #48bb78;
       --danger: #f56565;
       --accent: #4299e1;
+      --warning: #fbbf24;
     }
 
     body {
@@ -129,6 +130,7 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 2rem;
+      margin-bottom: 2rem;
     }
 
     .section-title {
@@ -180,6 +182,11 @@
     .badge.win {
       background: rgba(72, 187, 120, 0.2);
       color: var(--success);
+    }
+
+    .badge.open {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--warning);
     }
 
     .badge.leverage {
@@ -238,20 +245,20 @@
   <div class="container">
     <header>
       <h1>📈 Trading Tracker Dashboard</h1>
-      <p class="subtitle">10x Leverage Trading - Precise Capital Calculations</p>
+      <p class="subtitle">10x Leverage Trading - Closed & Open Positions</p>
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
 
     <div class="charts-grid">
       <div class="chart-section">
-        <div class="chart-title">📊 P&L by Trade</div>
+        <div class="chart-title">📊 P&L by Trade (Closed)</div>
         <div class="chart-container">
           <canvas id="pnlChart"></canvas>
         </div>
       </div>
       <div class="chart-section">
-        <div class="chart-title">📈 Cumulative P&L</div>
+        <div class="chart-title">📈 Cumulative P&L (Closed)</div>
         <div class="chart-container">
           <canvas id="cumulativeChart"></canvas>
         </div>
@@ -259,7 +266,7 @@
     </div>
 
     <div class="trades-section">
-      <div class="section-title">📋 All Trades</div>
+      <div class="section-title">✅ Closed Trades</div>
       <div class="table-wrapper">
         <table>
           <thead>
@@ -281,14 +288,40 @@
               <th>Duration</th>
             </tr>
           </thead>
-          <tbody id="tradesBody"></tbody>
+          <tbody id="closedTradesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="trades-section">
+      <div class="section-title">⏳ Open Positions</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Pos</th>
+              <th>Leverage</th>
+              <th>Entry</th>
+              <th>Current</th>
+              <th>Real Margin (USDT)</th>
+              <th>Size (USDT)</th>
+              <th>Qty</th>
+              <th>Liq. Price</th>
+              <th>Target</th>
+              <th>Current P&L (USDT)</th>
+              <th>ROE</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="openTradesBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
   <script>
-    const trades = [
+    const closedTrades = [
       {
         symbol: 'RARE/USDT',
         position: 'SHORT',
@@ -325,16 +358,39 @@
       }
     ];
 
-    function calculateStats() {
-      const totalTrades = trades.length;
-      const wins = trades.filter(t => t.roi > 0).length;
-      const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
-      const totalPnL = trades.reduce((sum, t) => sum + t.pnl, 0);
-      const avgROI = trades.length > 0 ? trades.reduce((sum, t) => sum + t.roi, 0) / trades.length : 0;
-      const bestTrade = Math.max(...trades.map(t => t.roi));
-      const totalRealCapital = trades.reduce((sum, t) => sum + t.realCapital, 0);
+    const openTrades = [
+      {
+        symbol: 'RECALL/USDT',
+        position: 'LONG',
+        leverage: 10,
+        entry: 0.04714,
+        current: 0.04892,
+        liqPrice: 0.04322,
+        target: 0.08000,
+        qty: 6662,
+        realMargin: 30.821,
+        size: 325.905,
+        pnl: 11.885,
+        roe: 38.56,
+        status: 'OPEN'
+      }
+    ];
 
-      return { totalTrades, winRate, totalPnL, avgROI, bestTrade, totalRealCapital };
+    function calculateStats() {
+      const closedCount = closedTrades.length;
+      const openCount = openTrades.length;
+      const totalCount = closedCount + openCount;
+      const wins = closedTrades.filter(t => t.roi > 0).length;
+      const winRate = closedCount > 0 ? Math.round((wins / closedCount) * 100) : 0;
+      const closedPnL = closedTrades.reduce((sum, t) => sum + t.pnl, 0);
+      const openPnL = openTrades.reduce((sum, t) => sum + t.pnl, 0);
+      const totalPnL = closedPnL + openPnL;
+      const closedAvgROI = closedCount > 0 ? closedTrades.reduce((sum, t) => sum + t.roi, 0) / closedCount : 0;
+      const openAvgROE = openCount > 0 ? openTrades.reduce((sum, t) => sum + t.roe, 0) / openCount : 0;
+      const bestTrade = Math.max(...closedTrades.map(t => t.roi));
+      const totalRealCapital = closedTrades.reduce((sum, t) => sum + t.realCapital, 0) + openTrades.reduce((sum, t) => sum + t.realMargin, 0);
+
+      return { totalCount, closedCount, openCount, winRate, closedPnL, openPnL, totalPnL, closedAvgROI, openAvgROE, bestTrade, totalRealCapital };
     }
 
     function renderStats() {
@@ -343,44 +399,44 @@
       
       statsGrid.innerHTML = `
         <div class="stat-card">
-          <div class="stat-label">Total Trades</div>
-          <div class="stat-value">${stats.totalTrades}</div>
+          <div class="stat-label">Total Positions</div>
+          <div class="stat-value">${stats.totalCount}</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Win Rate</div>
           <div class="stat-value">${stats.winRate}%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total P&L</div>
-          <div class="stat-value ${stats.totalPnL > 0 ? 'positive' : 'negative'}">${stats.totalPnL.toFixed(2)} USDT</div>
+          <div class="stat-label">Closed P&L</div>
+          <div class="stat-value ${stats.closedPnL > 0 ? 'positive' : 'negative'}">${stats.closedPnL.toFixed(2)} USDT</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Avg ROI</div>
-          <div class="stat-value ${stats.avgROI > 0 ? 'positive' : 'negative'}">${stats.avgROI.toFixed(2)}%</div>
+          <div class="stat-label">Open P&L</div>
+          <div class="stat-value ${stats.openPnL > 0 ? 'positive' : 'negative'}">${stats.openPnL.toFixed(2)} USDT</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total P&L</div>
+          <div class="stat-value ${stats.totalPnL > 0 ? 'positive' : 'negative'}">${stats.totalPnL.toFixed(2)} USDT</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Capital</div>
           <div class="stat-value">${stats.totalRealCapital.toFixed(2)} USDT</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Best Trade</div>
-          <div class="stat-value positive">${stats.bestTrade.toFixed(2)}%</div>
-        </div>
       `;
     }
 
     function renderCharts() {
-      // P&L by Trade Chart
+      // P&L by Trade Chart (Closed only)
       const pnlCtx = document.getElementById('pnlChart').getContext('2d');
       new Chart(pnlCtx, {
         type: 'bar',
         data: {
-          labels: trades.map(t => t.symbol),
+          labels: closedTrades.map(t => t.symbol),
           datasets: [{
             label: 'P&L (USDT)',
-            data: trades.map(t => t.pnl),
-            backgroundColor: trades.map(t => t.pnl > 0 ? 'rgba(72, 187, 120, 0.7)' : 'rgba(245, 101, 101, 0.7)'),
-            borderColor: trades.map(t => t.pnl > 0 ? '#48bb78' : '#f56565'),
+            data: closedTrades.map(t => t.pnl),
+            backgroundColor: closedTrades.map(t => t.pnl > 0 ? 'rgba(72, 187, 120, 0.7)' : 'rgba(245, 101, 101, 0.7)'),
+            borderColor: closedTrades.map(t => t.pnl > 0 ? '#48bb78' : '#f56565'),
             borderWidth: 2,
             borderRadius: 6
           }]
@@ -410,9 +466,9 @@
         }
       });
 
-      // Cumulative P&L Chart
+      // Cumulative P&L Chart (Closed only)
       let cumulative = 0;
-      const cumulativeValues = trades.map(t => {
+      const cumulativeValues = closedTrades.map(t => {
         cumulative += t.pnl;
         return cumulative;
       });
@@ -421,7 +477,7 @@
       new Chart(cumulativeCtx, {
         type: 'line',
         data: {
-          labels: trades.map((t, i) => `Trade ${i + 1} (${t.symbol})`),
+          labels: closedTrades.map((t, i) => `Trade ${i + 1} (${t.symbol})`),
           datasets: [{
             label: 'Cumulative P&L (USDT)',
             data: cumulativeValues,
@@ -461,9 +517,9 @@
       });
     }
 
-    function renderTrades() {
-      const tradesBody = document.getElementById('tradesBody');
-      tradesBody.innerHTML = trades.map(t => `
+    function renderClosedTrades() {
+      const tradesBody = document.getElementById('closedTradesBody');
+      tradesBody.innerHTML = closedTrades.map(t => `
         <tr>
           <td><strong>${t.symbol}</strong></td>
           <td>${t.position}</td>
@@ -484,9 +540,31 @@
       `).join('');
     }
 
+    function renderOpenTrades() {
+      const tradesBody = document.getElementById('openTradesBody');
+      tradesBody.innerHTML = openTrades.map(t => `
+        <tr>
+          <td><strong>${t.symbol}</strong></td>
+          <td>${t.position}</td>
+          <td><span class="badge leverage">${t.leverage}x</span></td>
+          <td>${t.entry.toFixed(5)}</td>
+          <td>${t.current.toFixed(5)}</td>
+          <td><span class="amount-badge">${t.realMargin.toFixed(2)}</span></td>
+          <td><span class="amount-badge">${t.size.toFixed(2)}</span></td>
+          <td>${t.qty}</td>
+          <td>${t.liqPrice.toFixed(5)}</td>
+          <td>${t.target.toFixed(5)}</td>
+          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
+          <td class="${t.roe > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roe > 0 ? '+' : ''}${t.roe.toFixed(2)}%</td>
+          <td><span class="badge open">📊 ${t.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
     renderStats();
     renderCharts();
-    renderTrades();
+    renderClosedTrades();
+    renderOpenTrades();
   </script>
 </body>
 </html>
