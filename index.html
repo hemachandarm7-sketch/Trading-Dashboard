@@ -99,6 +99,51 @@
       color: var(--danger);
     }
 
+    .time-period-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 2.5rem;
+    }
+
+    .time-period-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .time-period-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .time-period-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .time-stat {
+      padding: 10px;
+      background: rgba(66, 153, 225, 0.1);
+      border-radius: 6px;
+    }
+
+    .time-stat-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .time-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -184,6 +229,11 @@
       color: var(--success);
     }
 
+    .badge.loss {
+      background: rgba(245, 101, 101, 0.2);
+      color: var(--danger);
+    }
+
     .badge.open {
       background: rgba(251, 191, 36, 0.2);
       color: var(--warning);
@@ -232,6 +282,9 @@
       .charts-grid {
         grid-template-columns: 1fr;
       }
+      .time-period-grid {
+        grid-template-columns: 1fr;
+      }
       table {
         font-size: 11px;
       }
@@ -245,10 +298,12 @@
   <div class="container">
     <header>
       <h1>📈 Trading Tracker Dashboard</h1>
-      <p class="subtitle">10x Leverage Trading - Closed & Open Positions</p>
+      <p class="subtitle">10x Leverage Trading - Performance Analytics</p>
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="time-period-grid" id="timePeriodGrid"></div>
 
     <div class="charts-grid">
       <div class="chart-section">
@@ -258,7 +313,7 @@
         </div>
       </div>
       <div class="chart-section">
-        <div class="chart-title">📈 Cumulative P&L (Closed)</div>
+        <div class="chart-title">📈 Cumulative P&L</div>
         <div class="chart-container">
           <canvas id="cumulativeChart"></canvas>
         </div>
@@ -279,12 +334,9 @@
               <th>Real Capital (USDT)</th>
               <th>Notional (USDT)</th>
               <th>Qty</th>
-              <th>SL</th>
-              <th>Target</th>
               <th>P&L (USDT)</th>
               <th>ROI</th>
               <th>Status</th>
-              <th>Close</th>
               <th>Duration</th>
             </tr>
           </thead>
@@ -328,8 +380,6 @@
         leverage: 10,
         entry: 0.02270,
         exit: 0.01795,
-        sl: 0.02398,
-        target: 0.01590,
         qty: 8073,
         realCapital: 18.31,
         notional: 183.10,
@@ -337,7 +387,7 @@
         roi: 209.00,
         duration: '1d 21h',
         status: 'WIN',
-        closeReason: 'Manual Close'
+        date: '2026-09-30'
       },
       {
         symbol: 'INX/USDT',
@@ -345,8 +395,6 @@
         leverage: 10,
         entry: 0.5742,
         exit: 0.7360,
-        sl: 0,
-        target: 0.7360,
         qty: 333,
         realCapital: 25.00,
         notional: 250.00,
@@ -354,7 +402,7 @@
         roi: 215.41,
         duration: '4d 21h',
         status: 'WIN',
-        closeReason: 'TP Hit'
+        date: '2026-09-27'
       }
     ];
 
@@ -372,7 +420,24 @@
         size: 325.905,
         pnl: 11.885,
         roe: 38.56,
-        status: 'OPEN'
+        status: 'OPEN',
+        date: '2026-09-30'
+      },
+      {
+        symbol: 'STBL/USDT',
+        position: 'LONG',
+        leverage: 10,
+        entry: 0.02676,
+        current: 0.02652,
+        liqPrice: 0.0245,
+        target: 0.05300,
+        qty: 10103,
+        realMargin: 26.922,
+        size: 267.932,
+        pnl: -2.420,
+        roe: -8.99,
+        status: 'OPEN',
+        date: '2026-09-30'
       }
     ];
 
@@ -386,11 +451,35 @@
       const openPnL = openTrades.reduce((sum, t) => sum + t.pnl, 0);
       const totalPnL = closedPnL + openPnL;
       const closedAvgROI = closedCount > 0 ? closedTrades.reduce((sum, t) => sum + t.roi, 0) / closedCount : 0;
-      const openAvgROE = openCount > 0 ? openTrades.reduce((sum, t) => sum + t.roe, 0) / openCount : 0;
-      const bestTrade = Math.max(...closedTrades.map(t => t.roi));
       const totalRealCapital = closedTrades.reduce((sum, t) => sum + t.realCapital, 0) + openTrades.reduce((sum, t) => sum + t.realMargin, 0);
 
-      return { totalCount, closedCount, openCount, winRate, closedPnL, openPnL, totalPnL, closedAvgROI, openAvgROE, bestTrade, totalRealCapital };
+      return { totalCount, closedCount, openCount, winRate, closedPnL, openPnL, totalPnL, closedAvgROI, totalRealCapital };
+    }
+
+    function getTimePeriodStats() {
+      const today = new Date('2026-09-30');
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      const allTrades = [...closedTrades, ...openTrades];
+
+      const weeklyTrades = allTrades.filter(t => new Date(t.date) >= weekAgo);
+      const monthlyTrades = allTrades.filter(t => new Date(t.date) >= monthAgo);
+      const yearlyTrades = allTrades;
+
+      const calcStats = (trades) => {
+        const closedTr = trades.filter(t => t.status === 'WIN');
+        const openTr = trades.filter(t => t.status === 'OPEN');
+        const pnl = closedTr.reduce((sum, t) => sum + t.pnl, 0) + openTr.reduce((sum, t) => sum + t.pnl, 0);
+        const count = trades.length;
+        return { count, pnl };
+      };
+
+      return {
+        weekly: calcStats(weeklyTrades),
+        monthly: calcStats(monthlyTrades),
+        yearly: calcStats(yearlyTrades)
+      };
     }
 
     function renderStats() {
@@ -403,16 +492,16 @@
           <div class="stat-value">${stats.totalCount}</div>
         </div>
         <div class="stat-card">
+          <div class="stat-label">Closed Trades</div>
+          <div class="stat-value">${stats.closedCount}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Open Positions</div>
+          <div class="stat-value">${stats.openCount}</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-label">Win Rate</div>
           <div class="stat-value">${stats.winRate}%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Closed P&L</div>
-          <div class="stat-value ${stats.closedPnL > 0 ? 'positive' : 'negative'}">${stats.closedPnL.toFixed(2)} USDT</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Open P&L</div>
-          <div class="stat-value ${stats.openPnL > 0 ? 'positive' : 'negative'}">${stats.openPnL.toFixed(2)} USDT</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total P&L</div>
@@ -425,8 +514,54 @@
       `;
     }
 
+    function renderTimePeriods() {
+      const periods = getTimePeriodStats();
+      const grid = document.getElementById('timePeriodGrid');
+
+      grid.innerHTML = `
+        <div class="time-period-card">
+          <div class="time-period-title">📅 Weekly Performance</div>
+          <div class="time-period-stats">
+            <div class="time-stat">
+              <div class="time-stat-label">Trades</div>
+              <div class="time-stat-value">${periods.weekly.count}</div>
+            </div>
+            <div class="time-stat">
+              <div class="time-stat-label">P&L (USDT)</div>
+              <div class="time-stat-value ${periods.weekly.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${periods.weekly.pnl.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="time-period-card">
+          <div class="time-period-title">📊 Monthly Performance</div>
+          <div class="time-period-stats">
+            <div class="time-stat">
+              <div class="time-stat-label">Trades</div>
+              <div class="time-stat-value">${periods.monthly.count}</div>
+            </div>
+            <div class="time-stat">
+              <div class="time-stat-label">P&L (USDT)</div>
+              <div class="time-stat-value ${periods.monthly.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${periods.monthly.pnl.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="time-period-card">
+          <div class="time-period-title">📈 Yearly Performance</div>
+          <div class="time-period-stats">
+            <div class="time-stat">
+              <div class="time-stat-label">Trades</div>
+              <div class="time-stat-value">${periods.yearly.count}</div>
+            </div>
+            <div class="time-stat">
+              <div class="time-stat-label">P&L (USDT)</div>
+              <div class="time-stat-value ${periods.yearly.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${periods.yearly.pnl.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderCharts() {
-      // P&L by Trade Chart (Closed only)
       const pnlCtx = document.getElementById('pnlChart').getContext('2d');
       new Chart(pnlCtx, {
         type: 'bar',
@@ -445,28 +580,15 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              labels: {
-                color: '#a0aec0',
-                font: { size: 12 }
-              }
-            }
+            legend: { labels: { color: '#a0aec0', font: { size: 12 } } }
           },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { color: '#a0aec0' },
-              grid: { color: 'rgba(45, 55, 72, 0.3)' }
-            },
-            x: {
-              ticks: { color: '#a0aec0' },
-              grid: { color: 'rgba(45, 55, 72, 0.3)' }
-            }
+            y: { beginAtZero: true, ticks: { color: '#a0aec0' }, grid: { color: 'rgba(45, 55, 72, 0.3)' } },
+            x: { ticks: { color: '#a0aec0' }, grid: { color: 'rgba(45, 55, 72, 0.3)' } }
           }
         }
       });
 
-      // Cumulative P&L Chart (Closed only)
       let cumulative = 0;
       const cumulativeValues = closedTrades.map(t => {
         cumulative += t.pnl;
@@ -496,22 +618,11 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              labels: {
-                color: '#a0aec0',
-                font: { size: 12 }
-              }
-            }
+            legend: { labels: { color: '#a0aec0', font: { size: 12 } } }
           },
           scales: {
-            y: {
-              ticks: { color: '#a0aec0' },
-              grid: { color: 'rgba(45, 55, 72, 0.3)' }
-            },
-            x: {
-              ticks: { color: '#a0aec0' },
-              grid: { color: 'rgba(45, 55, 72, 0.3)' }
-            }
+            y: { ticks: { color: '#a0aec0' }, grid: { color: 'rgba(45, 55, 72, 0.3)' } },
+            x: { ticks: { color: '#a0aec0' }, grid: { color: 'rgba(45, 55, 72, 0.3)' } }
           }
         }
       });
@@ -529,12 +640,9 @@
           <td><span class="amount-badge">${t.realCapital.toFixed(2)}</span></td>
           <td><span class="amount-badge">${t.notional.toFixed(2)}</span></td>
           <td>${t.qty}</td>
-          <td>${t.sl.toFixed(4)}</td>
-          <td>${t.target.toFixed(5)}</td>
           <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
           <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
           <td><span class="badge win">${t.status}</span></td>
-          <td>${t.closeReason}</td>
           <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
         </tr>
       `).join('');
@@ -556,12 +664,13 @@
           <td>${t.target.toFixed(5)}</td>
           <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
           <td class="${t.roe > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roe > 0 ? '+' : ''}${t.roe.toFixed(2)}%</td>
-          <td><span class="badge open">📊 ${t.status}</span></td>
+          <td><span class="badge ${t.pnl > 0 ? 'open' : 'loss'}">📊 ${t.status}</span></td>
         </tr>
       `).join('');
     }
 
     renderStats();
+    renderTimePeriods();
     renderCharts();
     renderClosedTrades();
     renderOpenTrades();
