@@ -296,4 +296,26 @@
 
     function renderTrades() {
       const tradesBody = document.getElementById('tradesBody');
-      tradesBody.innerHTML
+      tradesBody.innerHTML = trades.map(t => `
+        <tr>
+          <td><strong>${t.symbol}</strong></td>
+          <td>${t.position}</td>
+          <td>${t.entry.toFixed(5)}</td>
+          <td>${t.exit.toFixed(5)}</td>
+          <td>${t.sl.toFixed(4)}</td>
+          <td>${t.target.toFixed(5)}</td>
+          <td>${t.qty}</td>
+          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
+          <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
+          <td><span class="badge win">${t.status}</span></td>
+          <td>${t.closeReason}</td>
+          <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    renderStats();
+    renderTrades();
+  </script>
+</body>
+</html>
