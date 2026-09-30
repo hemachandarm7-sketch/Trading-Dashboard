@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-card: #1a1f3a;
+      --text-primary: #ffffff;
+      --text-secondary: #a0aec0;
+      --border-color: #2d3748;
+      --success: #48bb78;
+      --danger: #f56565;
+      --accent: #4299e1;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1333 100%);
+      color: var(--text-primary);
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(26, 31, 58, 0.5) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .stat-value.positive {
+      color: var(--success);
+    }
+
+    .stat-value.negative {
+      color: var(--danger);
+    }
+
+    .trades-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: rgba(66, 153, 225, 0.05);
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    tr:hover {
+      background: rgba(66, 153, 225, 0.08);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.win {
+      background: rgba(72, 187, 120, 0.2);
+      color: var(--success);
+    }
+
+    .pnl-positive {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .pnl-negative {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .duration-badge {
+      background: rgba(66, 153, 225, 0.2);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 24px;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📈 Trading Tracker Dashboard</h1>
+      <p class="subtitle">Auto-updated live trading analytics</p>
+    </header>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="trades-section">
+      <div class="section-title">📋 All Trades</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Pos</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th>SL</th>
+              <th>Target</th>
+              <th>Qty</th>
+              <th>P&L (USDT)</th>
+              <th>ROI</th>
+              <th>Status</th>
+              <th>Close</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody id="tradesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const trades = [
+      {
+        symbol: 'RARE/USDT',
+        position: 'SHORT',
+        entry: 0.02270,
+        exit: 0.01795,
+        sl: 0.02398,
+        target: 0.01590,
+        qty: 8073,
+        pnl: 38.261,
+        roi: 209,
+        duration: '1d 21h',
+        status: 'WIN',
+        closeReason: 'Manual Close'
+      },
+      {
+        symbol: 'INX/USDT',
+        position: 'LONG',
+        entry: 0.5742,
+        exit: 0.7360,
+        sl: 0,
+        target: 0.7360,
+        qty: 54055,
+        pnl: 53.866,
+        roi: 28.16,
+        duration: '4d 21h',
+        status: 'WIN',
+        closeReason: 'TP Hit'
+      }
+    ];
+
+    function calculateStats() {
+      const totalTrades = trades.length;
+      const wins = trades.filter(t => t.roi > 0).length;
+      const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
+      const totalPnL = trades.reduce((sum, t) => sum + t.pnl, 0);
+      const avgROI = trades.length > 0 ? trades.reduce((sum, t) => sum + t.roi, 0) / trades.length : 0;
+      const bestTrade = Math.max(...trades.map(t => t.roi));
+
+      return { totalTrades, winRate, totalPnL, avgROI, bestTrade };
+    }
+
+    function renderStats() {
+      const stats = calculateStats();
+      const statsGrid = document.getElementById('statsGrid');
+      
+      statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Total Trades</div>
+          <div class="stat-value">${stats.totalTrades}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Win Rate</div>
+          <div class="stat-value">${stats.winRate}%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total P&L</div>
+          <div class="stat-value ${stats.totalPnL > 0 ? 'positive' : 'negative'}">${stats.totalPnL.toFixed(2)}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg ROI</div>
+          <div class="stat-value ${stats.avgROI > 0 ? 'positive' : 'negative'}">${stats.avgROI.toFixed(2)}%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Closed Trades</div>
+          <div class="stat-value">${stats.totalTrades}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best Trade</div>
+          <div class="stat-value positive">${stats.bestTrade.toFixed(0)}%</div>
+        </div>
+      `;
+    }
+
+    function renderTrades() {
+      const tradesBody = document.getElementById('tradesBody');
+      tradesBody.innerHTML
