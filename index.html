@@ -238,7 +238,7 @@
   <div class="container">
     <header>
       <h1>📈 Trading Tracker Dashboard</h1>
-      <p class="subtitle">Leverage Trading Analytics - Real Amounts with 10x Leverage</p>
+      <p class="subtitle">10x Leverage Trading - Precise Capital Calculations</p>
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
@@ -269,8 +269,8 @@
               <th>Leverage</th>
               <th>Entry</th>
               <th>Exit</th>
-              <th>Entry Amt (USDT)</th>
-              <th>Exit Amt (USDT)</th>
+              <th>Real Capital (USDT)</th>
+              <th>Notional (USDT)</th>
               <th>Qty</th>
               <th>SL</th>
               <th>Target</th>
@@ -298,12 +298,10 @@
         sl: 0.02398,
         target: 0.01590,
         qty: 8073,
-        notionalEntryAmount: 182.80,
-        notionalExitAmount: 144.51,
-        entryAmount: 18.28,
-        exitAmount: 14.45,
+        realCapital: 18.31,
+        notional: 183.10,
         pnl: 38.261,
-        roi: 209.27,
+        roi: 209.00,
         duration: '1d 21h',
         status: 'WIN',
         closeReason: 'Manual Close'
@@ -317,12 +315,10 @@
         sl: 0,
         target: 0.7360,
         qty: 333,
-        notionalEntryAmount: 191.21,
-        notionalExitAmount: 244.89,
-        entryAmount: 19.12,
-        exitAmount: 24.49,
+        realCapital: 191.35,
+        notional: 1913.50,
         pnl: 53.866,
-        roi: 281.54,
+        roi: 28.16,
         duration: '4d 21h',
         status: 'WIN',
         closeReason: 'TP Hit'
@@ -336,9 +332,9 @@
       const totalPnL = trades.reduce((sum, t) => sum + t.pnl, 0);
       const avgROI = trades.length > 0 ? trades.reduce((sum, t) => sum + t.roi, 0) / trades.length : 0;
       const bestTrade = Math.max(...trades.map(t => t.roi));
-      const totalVolume = trades.reduce((sum, t) => sum + t.entryAmount, 0);
+      const totalRealCapital = trades.reduce((sum, t) => sum + t.realCapital, 0);
 
-      return { totalTrades, winRate, totalPnL, avgROI, bestTrade, totalVolume };
+      return { totalTrades, winRate, totalPnL, avgROI, bestTrade, totalRealCapital };
     }
 
     function renderStats() {
@@ -363,8 +359,8 @@
           <div class="stat-value ${stats.avgROI > 0 ? 'positive' : 'negative'}">${stats.avgROI.toFixed(2)}%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total Volume</div>
-          <div class="stat-value">${stats.totalVolume.toFixed(2)} USDT</div>
+          <div class="stat-label">Total Capital</div>
+          <div class="stat-value">${stats.totalRealCapital.toFixed(2)} USDT</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Best Trade</div>
@@ -474,8 +470,8 @@
           <td><span class="badge leverage">${t.leverage}x</span></td>
           <td>${t.entry.toFixed(5)}</td>
           <td>${t.exit.toFixed(5)}</td>
-          <td><span class="amount-badge">${t.entryAmount.toFixed(2)}</span></td>
-          <td><span class="amount-badge">${t.exitAmount.toFixed(2)}</span></td>
+          <td><span class="amount-badge">${t.realCapital.toFixed(2)}</span></td>
+          <td><span class="amount-badge">${t.notional.toFixed(2)}</span></td>
           <td>${t.qty}</td>
           <td>${t.sl.toFixed(4)}</td>
           <td>${t.target.toFixed(5)}</td>
