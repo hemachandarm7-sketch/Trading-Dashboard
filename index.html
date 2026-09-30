@@ -100,8 +100,8 @@
 
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 20px;
       margin-bottom: 2.5rem;
     }
 
@@ -121,7 +121,7 @@
 
     .chart-container {
       position: relative;
-      height: 300px;
+      height: 350px;
     }
 
     .trades-section {
@@ -144,15 +144,15 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     th {
-      padding: 14px 12px;
+      padding: 12px 10px;
       text-align: left;
       border-bottom: 2px solid var(--border-color);
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
@@ -160,7 +160,7 @@
     }
 
     td {
-      padding: 14px 12px;
+      padding: 12px 10px;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -192,20 +192,21 @@
       font-weight: 700;
     }
 
-    .amount-positive {
-      color: var(--success);
-    }
-
-    .amount-negative {
-      color: var(--danger);
-    }
-
     .duration-badge {
       background: rgba(66, 153, 225, 0.2);
       color: var(--accent);
       padding: 4px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .amount-badge {
+      background: rgba(100, 150, 255, 0.2);
+      color: #60a5fa;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
       font-weight: 600;
     }
 
@@ -220,10 +221,10 @@
         grid-template-columns: 1fr;
       }
       table {
-        font-size: 12px;
+        font-size: 11px;
       }
       th, td {
-        padding: 10px 6px;
+        padding: 8px 5px;
       }
     }
   </style>
@@ -232,22 +233,22 @@
   <div class="container">
     <header>
       <h1>📈 Trading Tracker Dashboard</h1>
-      <p class="subtitle">Auto-updated live trading analytics</p>
+      <p class="subtitle">Auto-updated live trading analytics with charts</p>
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
 
     <div class="charts-grid">
       <div class="chart-section">
-        <div class="chart-title">📊 Cumulative P&L</div>
+        <div class="chart-title">📊 P&L by Trade</div>
         <div class="chart-container">
           <canvas id="pnlChart"></canvas>
         </div>
       </div>
       <div class="chart-section">
-        <div class="chart-title">🎯 Win/Loss Breakdown</div>
+        <div class="chart-title">📈 Cumulative P&L</div>
         <div class="chart-container">
-          <canvas id="winLossChart"></canvas>
+          <canvas id="cumulativeChart"></canvas>
         </div>
       </div>
     </div>
@@ -262,11 +263,11 @@
               <th>Pos</th>
               <th>Entry</th>
               <th>Exit</th>
+              <th>Entry Amt</th>
+              <th>Exit Amt</th>
+              <th>Qty</th>
               <th>SL</th>
               <th>Target</th>
-              <th>Qty</th>
-              <th>Amount Invested</th>
-              <th>Amount Returned</th>
               <th>P&L (USDT)</th>
               <th>ROI</th>
               <th>Status</th>
@@ -290,6 +291,8 @@
         sl: 0.02398,
         target: 0.01590,
         qty: 8073,
+        entryAmount: 183.26,
+        exitAmount: 144.91,
         pnl: 38.261,
         roi: 209,
         duration: '1d 21h',
@@ -304,6 +307,8 @@
         sl: 0,
         target: 0.7360,
         qty: 54055,
+        entryAmount: 31.05,
+        exitAmount: 39.80,
         pnl: 53.866,
         roi: 28.16,
         duration: '4d 21h',
@@ -312,26 +317,16 @@
       }
     ];
 
-    function calculateAmountInvested(trade) {
-      return trade.entry * trade.qty;
-    }
-
-    function calculateAmountReturned(trade) {
-      return trade.exit * trade.qty;
-    }
-
     function calculateStats() {
       const totalTrades = trades.length;
       const wins = trades.filter(t => t.roi > 0).length;
-      const losses = trades.filter(t => t.roi < 0).length;
       const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
       const totalPnL = trades.reduce((sum, t) => sum + t.pnl, 0);
       const avgROI = trades.length > 0 ? trades.reduce((sum, t) => sum + t.roi, 0) / trades.length : 0;
       const bestTrade = Math.max(...trades.map(t => t.roi));
-      const totalInvested = trades.reduce((sum, t) => sum + calculateAmountInvested(t), 0);
-      const totalReturned = trades.reduce((sum, t) => sum + calculateAmountReturned(t), 0);
+      const totalVolume = trades.reduce((sum, t) => sum + t.entryAmount, 0);
 
-      return { totalTrades, winRate, totalPnL, avgROI, bestTrade, wins, losses, totalInvested, totalReturned };
+      return { totalTrades, winRate, totalPnL, avgROI, bestTrade, totalVolume };
     }
 
     function renderStats() {
@@ -349,23 +344,15 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Total P&L</div>
-          <div class="stat-value ${stats.totalPnL > 0 ? 'positive' : 'negative'}">${stats.totalPnL.toFixed(2)}</div>
+          <div class="stat-value ${stats.totalPnL > 0 ? 'positive' : 'negative'}">${stats.totalPnL.toFixed(2)} USDT</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Avg ROI</div>
           <div class="stat-value ${stats.avgROI > 0 ? 'positive' : 'negative'}">${stats.avgROI.toFixed(2)}%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total Invested</div>
-          <div class="stat-value">${stats.totalInvested.toFixed(2)}</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Returned</div>
-          <div class="stat-value positive">${stats.totalReturned.toFixed(2)}</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Wins / Losses</div>
-          <div class="stat-value"><span style="color: var(--success);">${stats.wins}W</span> / <span style="color: var(--danger);">${stats.losses}L</span></div>
+          <div class="stat-label">Total Volume</div>
+          <div class="stat-value">${stats.totalVolume.toFixed(2)} USDT</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Best Trade</div>
@@ -375,33 +362,19 @@
     }
 
     function renderCharts() {
-      const stats = calculateStats();
-      
-      // Cumulative P&L Chart
-      const cumulativePnL = [];
-      let runningTotal = 0;
-      trades.forEach(t => {
-        runningTotal += t.pnl;
-        cumulativePnL.push(runningTotal);
-      });
-
+      // P&L by Trade Chart
       const pnlCtx = document.getElementById('pnlChart').getContext('2d');
       new Chart(pnlCtx, {
-        type: 'line',
+        type: 'bar',
         data: {
           labels: trades.map(t => t.symbol),
           datasets: [{
-            label: 'Cumulative P&L (USDT)',
-            data: cumulativePnL,
-            borderColor: '#48bb78',
-            backgroundColor: 'rgba(72, 187, 120, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 6,
-            pointBackgroundColor: '#48bb78',
-            pointBorderColor: '#0a0e27',
-            pointBorderWidth: 2
+            label: 'P&L (USDT)',
+            data: trades.map(t => t.pnl),
+            backgroundColor: trades.map(t => t.pnl > 0 ? 'rgba(72, 187, 120, 0.7)' : 'rgba(245, 101, 101, 0.7)'),
+            borderColor: trades.map(t => t.pnl > 0 ? '#48bb78' : '#f56565'),
+            borderWidth: 2,
+            borderRadius: 6
           }]
         },
         options: {
@@ -409,7 +382,6 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: true,
               labels: {
                 color: '#a0aec0',
                 font: { size: 12 }
@@ -418,29 +390,42 @@
           },
           scales: {
             y: {
-              grid: { color: 'rgba(45, 55, 72, 0.3)' },
+              beginAtZero: true,
               ticks: { color: '#a0aec0' },
-              title: { display: true, text: 'P&L (USDT)', color: '#a0aec0' }
+              grid: { color: 'rgba(45, 55, 72, 0.3)' }
             },
             x: {
-              grid: { color: 'rgba(45, 55, 72, 0.3)' },
-              ticks: { color: '#a0aec0' }
+              ticks: { color: '#a0aec0' },
+              grid: { color: 'rgba(45, 55, 72, 0.3)' }
             }
           }
         }
       });
 
-      // Win/Loss Pie Chart
-      const winLossCtx = document.getElementById('winLossChart').getContext('2d');
-      new Chart(winLossCtx, {
-        type: 'doughnut',
+      // Cumulative P&L Chart
+      let cumulative = 0;
+      const cumulativeValues = trades.map(t => {
+        cumulative += t.pnl;
+        return cumulative;
+      });
+
+      const cumulativeCtx = document.getElementById('cumulativeChart').getContext('2d');
+      new Chart(cumulativeCtx, {
+        type: 'line',
         data: {
-          labels: ['Wins', 'Losses'],
+          labels: trades.map((t, i) => `Trade ${i + 1} (${t.symbol})`),
           datasets: [{
-            data: [stats.wins, stats.losses],
-            backgroundColor: ['#48bb78', '#f56565'],
-            borderColor: '#0a0e27',
-            borderWidth: 2
+            label: 'Cumulative P&L (USDT)',
+            data: cumulativeValues,
+            borderColor: '#4299e1',
+            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 6,
+            pointBackgroundColor: '#4299e1',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2
           }]
         },
         options: {
@@ -448,13 +433,20 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: true,
-              position: 'bottom',
               labels: {
                 color: '#a0aec0',
-                font: { size: 12 },
-                padding: 15
+                font: { size: 12 }
               }
+            }
+          },
+          scales: {
+            y: {
+              ticks: { color: '#a0aec0' },
+              grid: { color: 'rgba(45, 55, 72, 0.3)' }
+            },
+            x: {
+              ticks: { color: '#a0aec0' },
+              grid: { color: 'rgba(45, 55, 72, 0.3)' }
             }
           }
         }
@@ -463,34 +455,29 @@
 
     function renderTrades() {
       const tradesBody = document.getElementById('tradesBody');
-      tradesBody.innerHTML = trades.map(t => {
-        const amountInvested = calculateAmountInvested(t);
-        const amountReturned = calculateAmountReturned(t);
-        
-        return `
-          <tr>
-            <td><strong>${t.symbol}</strong></td>
-            <td>${t.position}</td>
-            <td>${t.entry.toFixed(5)}</td>
-            <td>${t.exit.toFixed(5)}</td>
-            <td>${t.sl.toFixed(5)}</td>
-            <td>${t.target.toFixed(5)}</td>
-            <td>${t.qty}</td>
-            <td class="amount-negative">${amountInvested.toFixed(2)}</td>
-            <td class="amount-positive">${amountReturned.toFixed(2)}</td>
-            <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
-            <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
-            <td><span class="badge win">${t.status}</span></td>
-            <td>${t.closeReason}</td>
-            <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
-          </tr>
-        `;
-      }).join('');
+      tradesBody.innerHTML = trades.map(t => `
+        <tr>
+          <td><strong>${t.symbol}</strong></td>
+          <td>${t.position}</td>
+          <td>${t.entry.toFixed(5)}</td>
+          <td>${t.exit.toFixed(5)}</td>
+          <td><span class="amount-badge">${t.entryAmount.toFixed(2)}</span></td>
+          <td><span class="amount-badge">${t.exitAmount.toFixed(2)}</span></td>
+          <td>${t.qty}</td>
+          <td>${t.sl.toFixed(4)}</td>
+          <td>${t.target.toFixed(5)}</td>
+          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
+          <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
+          <td><span class="badge win">${t.status}</span></td>
+          <td>${t.closeReason}</td>
+          <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
+        </tr>
+      `).join('');
     }
 
     renderStats();
-    renderTrades();
     renderCharts();
+    renderTrades();
   </script>
 </body>
 </html>
