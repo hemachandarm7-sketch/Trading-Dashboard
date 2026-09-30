@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trading Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -31,7 +32,7 @@
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -95,6 +96,32 @@
 
     .stat-value.negative {
       color: var(--danger);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .chart-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
     }
 
     .trades-section {
@@ -165,6 +192,14 @@
       font-weight: 700;
     }
 
+    .amount-positive {
+      color: var(--success);
+    }
+
+    .amount-negative {
+      color: var(--danger);
+    }
+
     .duration-badge {
       background: rgba(66, 153, 225, 0.2);
       color: var(--accent);
@@ -181,6 +216,15 @@
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      table {
+        font-size: 12px;
+      }
+      th, td {
+        padding: 10px 6px;
+      }
     }
   </style>
 </head>
@@ -192,6 +236,21 @@
     </header>
 
     <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="charts-grid">
+      <div class="chart-section">
+        <div class="chart-title">📊 Cumulative P&L</div>
+        <div class="chart-container">
+          <canvas id="pnlChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-title">🎯 Win/Loss Breakdown</div>
+        <div class="chart-container">
+          <canvas id="winLossChart"></canvas>
+        </div>
+      </div>
+    </div>
 
     <div class="trades-section">
       <div class="section-title">📋 All Trades</div>
@@ -206,6 +265,8 @@
               <th>SL</th>
               <th>Target</th>
               <th>Qty</th>
+              <th>Amount Invested</th>
+              <th>Amount Returned</th>
               <th>P&L (USDT)</th>
               <th>ROI</th>
               <th>Status</th>
@@ -251,15 +312,26 @@
       }
     ];
 
+    function calculateAmountInvested(trade) {
+      return trade.entry * trade.qty;
+    }
+
+    function calculateAmountReturned(trade) {
+      return trade.exit * trade.qty;
+    }
+
     function calculateStats() {
       const totalTrades = trades.length;
       const wins = trades.filter(t => t.roi > 0).length;
+      const losses = trades.filter(t => t.roi < 0).length;
       const winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
       const totalPnL = trades.reduce((sum, t) => sum + t.pnl, 0);
       const avgROI = trades.length > 0 ? trades.reduce((sum, t) => sum + t.roi, 0) / trades.length : 0;
       const bestTrade = Math.max(...trades.map(t => t.roi));
+      const totalInvested = trades.reduce((sum, t) => sum + calculateAmountInvested(t), 0);
+      const totalReturned = trades.reduce((sum, t) => sum + calculateAmountReturned(t), 0);
 
-      return { totalTrades, winRate, totalPnL, avgROI, bestTrade };
+      return { totalTrades, winRate, totalPnL, avgROI, bestTrade, wins, losses, totalInvested, totalReturned };
     }
 
     function renderStats() {
@@ -284,8 +356,16 @@
           <div class="stat-value ${stats.avgROI > 0 ? 'positive' : 'negative'}">${stats.avgROI.toFixed(2)}%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Closed Trades</div>
-          <div class="stat-value">${stats.totalTrades}</div>
+          <div class="stat-label">Total Invested</div>
+          <div class="stat-value">${stats.totalInvested.toFixed(2)}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Returned</div>
+          <div class="stat-value positive">${stats.totalReturned.toFixed(2)}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Wins / Losses</div>
+          <div class="stat-value"><span style="color: var(--success);">${stats.wins}W</span> / <span style="color: var(--danger);">${stats.losses}L</span></div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Best Trade</div>
@@ -294,28 +374,123 @@
       `;
     }
 
+    function renderCharts() {
+      const stats = calculateStats();
+      
+      // Cumulative P&L Chart
+      const cumulativePnL = [];
+      let runningTotal = 0;
+      trades.forEach(t => {
+        runningTotal += t.pnl;
+        cumulativePnL.push(runningTotal);
+      });
+
+      const pnlCtx = document.getElementById('pnlChart').getContext('2d');
+      new Chart(pnlCtx, {
+        type: 'line',
+        data: {
+          labels: trades.map(t => t.symbol),
+          datasets: [{
+            label: 'Cumulative P&L (USDT)',
+            data: cumulativePnL,
+            borderColor: '#48bb78',
+            backgroundColor: 'rgba(72, 187, 120, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 6,
+            pointBackgroundColor: '#48bb78',
+            pointBorderColor: '#0a0e27',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                color: '#a0aec0',
+                font: { size: 12 }
+              }
+            }
+          },
+          scales: {
+            y: {
+              grid: { color: 'rgba(45, 55, 72, 0.3)' },
+              ticks: { color: '#a0aec0' },
+              title: { display: true, text: 'P&L (USDT)', color: '#a0aec0' }
+            },
+            x: {
+              grid: { color: 'rgba(45, 55, 72, 0.3)' },
+              ticks: { color: '#a0aec0' }
+            }
+          }
+        }
+      });
+
+      // Win/Loss Pie Chart
+      const winLossCtx = document.getElementById('winLossChart').getContext('2d');
+      new Chart(winLossCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Wins', 'Losses'],
+          datasets: [{
+            data: [stats.wins, stats.losses],
+            backgroundColor: ['#48bb78', '#f56565'],
+            borderColor: '#0a0e27',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: {
+                color: '#a0aec0',
+                font: { size: 12 },
+                padding: 15
+              }
+            }
+          }
+        }
+      });
+    }
+
     function renderTrades() {
       const tradesBody = document.getElementById('tradesBody');
-      tradesBody.innerHTML = trades.map(t => `
-        <tr>
-          <td><strong>${t.symbol}</strong></td>
-          <td>${t.position}</td>
-          <td>${t.entry.toFixed(5)}</td>
-          <td>${t.exit.toFixed(5)}</td>
-          <td>${t.sl.toFixed(4)}</td>
-          <td>${t.target.toFixed(5)}</td>
-          <td>${t.qty}</td>
-          <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
-          <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
-          <td><span class="badge win">${t.status}</span></td>
-          <td>${t.closeReason}</td>
-          <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
-        </tr>
-      `).join('');
+      tradesBody.innerHTML = trades.map(t => {
+        const amountInvested = calculateAmountInvested(t);
+        const amountReturned = calculateAmountReturned(t);
+        
+        return `
+          <tr>
+            <td><strong>${t.symbol}</strong></td>
+            <td>${t.position}</td>
+            <td>${t.entry.toFixed(5)}</td>
+            <td>${t.exit.toFixed(5)}</td>
+            <td>${t.sl.toFixed(5)}</td>
+            <td>${t.target.toFixed(5)}</td>
+            <td>${t.qty}</td>
+            <td class="amount-negative">${amountInvested.toFixed(2)}</td>
+            <td class="amount-positive">${amountReturned.toFixed(2)}</td>
+            <td class="${t.pnl > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</td>
+            <td class="${t.roi > 0 ? 'pnl-positive' : 'pnl-negative'}">${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%</td>
+            <td><span class="badge win">${t.status}</span></td>
+            <td>${t.closeReason}</td>
+            <td><span class="duration-badge">⏱️ ${t.duration}</span></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     renderStats();
     renderTrades();
+    renderCharts();
   </script>
 </body>
 </html>
