@@ -10,8 +10,8 @@
 <style>
 :root{--bg:#0f1419;--card:#1a2332;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--green:#2fd5a0;--red:#ff5468}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
+html{height:100%;overflow:auto}
+body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:100px;overflow-x:hidden}
 .container{max-width:800px;margin:0 auto;padding:16px}
 .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
 .greeting-section{flex:1}
@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <!-- TRADES TAB -->
 <div id="trades-tab" class="tabs-container">
 <div style="margin-bottom:20px">
-<h3 style="font-size:16px;margin-bottom:14px;font-weight:600">Your Trades</h3>
+<h3 style="font-size:16px;margin-bottom:14px;font-weight:600;color:var(--mut);text-transform:uppercase">Closed Trades (5)</h3>
 
 <div class="trade-row">
 <div class="trade-field">
@@ -166,8 +166,8 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="trade-field">
 <div class="trade-field-label">Entry / Exit</div>
 <div class="trade-field-value">0.02270 → 0.01795</div>
-<div class="trade-field-label" style="margin-top:8px">Status</div>
-<div class="trade-field-value gain">WIN</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value gain">+$38.26 (+209%)</div>
 </div>
 </div>
 
@@ -188,6 +188,78 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="trade-row">
 <div class="trade-field">
 <div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">RARE/USDT #2</div>
+<div class="trade-tag">SHORT 10x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Exit</div>
+<div class="trade-field-value">0.02250 → 0.02416</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value loss">-$9.94 (-73.71%)</div>
+</div>
+</div>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">WLD/USDT</div>
+<div class="trade-tag">LONG 10x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Exit</div>
+<div class="trade-field-value">0.56 → 0.55</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value loss">-$2.16 (-19.63%)</div>
+</div>
+</div>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">ENA/USDT</div>
+<div class="trade-tag">LONG 10x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Exit</div>
+<div class="trade-field-value">0.29 → 0.28</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value loss">-$3.50 (-28.10%)</div>
+</div>
+</div>
+
+<h3 style="font-size:16px;margin-bottom:14px;margin-top:24px;font-weight:600;color:var(--mut);text-transform:uppercase">Open Positions (5)</h3>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">RECALL/USDT</div>
+<div class="trade-tag">LONG 10x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Current</div>
+<div class="trade-field-value">0.04714 / 0.04892</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value gain">+$11.89 (+38.56%)</div>
+</div>
+</div>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">STBL/USDT</div>
+<div class="trade-tag">LONG 10x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Current</div>
+<div class="trade-field-value">0.02676 / 0.02652</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value loss">-$2.42 (-8.99%)</div>
+</div>
+</div>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
 <div class="trade-field-value">YB/USDT</div>
 <div class="trade-tag">LONG 5x</div>
 </div>
@@ -196,6 +268,34 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="trade-field-value">0.08701 / 0.08536</div>
 <div class="trade-field-label" style="margin-top:8px">P&L</div>
 <div class="trade-field-value loss">-$1.99 (-9.47%)</div>
+</div>
+</div>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">SIREN/USDT</div>
+<div class="trade-tag">LONG 7x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Current</div>
+<div class="trade-field-value">0.02310 / 0.02317</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value gain">+$0.33 (+2.12%)</div>
+</div>
+</div>
+
+<div class="trade-row">
+<div class="trade-field">
+<div class="trade-field-label">Symbol</div>
+<div class="trade-field-value">DEXE/USDT</div>
+<div class="trade-tag">LONG 7x</div>
+</div>
+<div class="trade-field">
+<div class="trade-field-label">Entry / Current</div>
+<div class="trade-field-value">2.075 / 2.076</div>
+<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-value gain">+$0.05 (+0.34%)</div>
 </div>
 </div>
 </div>
