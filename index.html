@@ -1,261 +1,234 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>TRADEPRO</title>
+<title>TRADEPRO - Trading Dashboard</title>
 <style>
-:root{--bg:#0b0b0f;--card:#18181c;--card2:#222227;--tx:#f2f4f8;--mut:#8a8f9c;--g:#2fd36b;--r:#ff5468;--b1:#2b8cff;--b2:#8fc4ff;--p:#b44cf0}
+:root{--bg:#0f172a;--card:#1a2847;--card2:#243558;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--g:#2fd5a0;--r:#ff5468;--y:#fca311;--b:#3f8aff;--p:#8a2be2}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;color:var(--tx);min-height:100vh;padding:14px;background:radial-gradient(circle at 15% 10%,#2a4fa8,#16306e 40%,#0b1a45 100%) fixed}
-.frame{max-width:1400px;margin:0 auto;background:var(--bg);border:6px solid rgba(160,190,255,.35);border-radius:28px;padding:12px}
-.hero{border-radius:22px;padding:22px;display:grid;grid-template-columns:1.2fr 1fr;gap:18px;background:radial-gradient(ellipse at 30% 40%,#8fc4ff 0,#3a74d8 35%,#14306f 75%);position:relative}
-.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.logo{font-weight:800;font-size:22px;letter-spacing:2px}.logo span{color:#fff;text-shadow:0 0 12px #fff}
-.live{font-size:12px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.35);padding:8px 14px;border-radius:20px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--g);animation:pl 1.5s infinite}@keyframes pl{50%{opacity:.3}}
-button{font:inherit;color:#fff;background:rgba(255,255,255,.18);border:0;border-radius:14px;padding:8px 14px;cursor:pointer}
-.bal small{color:rgba(255,255,255,.75);font-size:13px}.bal h1{font-size:clamp(34px,7vw,64px);font-weight:600;margin-top:4px}.bal h1 i{opacity:.5;font-style:normal}
-.minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mini{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(12px);border-radius:16px;padding:12px 14px}
-.mini small{font-size:11px;color:rgba(255,255,255,.75)}.mini b{display:block;font-size:22px;font-weight:600;margin-top:2px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:12px}
-.card{background:var(--card);border-radius:22px;padding:18px;min-width:0}
-.card h3{font-weight:500;font-size:17px;margin-bottom:12px}
-.c5{grid-column:span 5}.c4{grid-column:span 4}.c3{grid-column:span 3}.c6{grid-column:span 6}.c12{grid-column:span 12}
-.up{color:var(--g)}.dn{color:var(--r)}
-.bars{display:flex;align-items:flex-end;gap:8px;height:170px}
-.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:10px;color:var(--mut);gap:4px;position:relative}
-.bar div{width:100%;border-radius:8px;background:var(--card2);min-height:6px}
-.bar.hi div{background:linear-gradient(#2b8cff,#0f2d5c)}
-.bar .tip{background:#3a3a40;color:#fff;border-radius:10px;padding:2px 7px;width:auto;min-height:0;font-size:10px}
-.legend{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;font-size:12px;color:var(--mut)}.legend b{display:block;color:var(--tx);font-size:16px;font-weight:500}
-.sq{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
-.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #26262b;font-size:13px}.row small{display:block;color:var(--mut);font-size:11px}
-.per{background:var(--card2);border-radius:16px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.per small{color:var(--mut);display:block;font-size:11px}.per b{font-size:20px;font-weight:500}
-.big{font-size:32px;font-weight:500;margin-top:8px}
-.btn2{border-radius:16px;background:linear-gradient(135deg,#2b6af0,#3f86ff);padding:14px;text-align:center;font-weight:500;margin-top:8px}
-.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
-th{color:var(--mut);font-weight:500;text-align:left;padding:9px 10px;border-bottom:1px solid #2c2c32}td{padding:10px;border-bottom:1px solid #212126}
-.tag{padding:3px 9px;border-radius:10px;font-size:11px;background:var(--card2)}.tag.up{background:#12301f}.tag.dn{background:#3a1820}
-.cap{background:#10294d;color:var(--b2);padding:3px 9px;border-radius:10px}
-@media(max-width:900px){.hero{grid-template-columns:1fr}.c5,.c4,.c3,.c6{grid-column:span 12}body{padding:6px}.frame{border-width:3px;padding:8px}}
-</style></head><body><div class="frame">
-<div class="hero">
- <div class="top"><div class="logo">✱ <span>TRADEPRO</span></div>
- <div style="display:flex;gap:8px;align-items:center"><div class="live"><span class="dot"></span>LIVE · <span id="timestamp">--:--:--</span></div><button onclick="location.reload()">🔄 Refresh</button></div></div>
- <div class="bal"><small>Total P&amp;L (USDT)</small><h1 id="hTotal"></h1><small id="hSub"></small></div>
- <div class="minis" id="minis"></div>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh;padding:0}
+.container{max-width:1600px;margin:0 auto;padding:16px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.logo{font-size:24px;font-weight:700;letter-spacing:1px}.logo span{color:var(--g)}
+.header-right{display:flex;gap:12px;align-items:center}
+.timestamp{font-size:12px;color:var(--mut)}.dot{width:6px;height:6px;background:var(--g);border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.4}}
+button.refresh{background:var(--card);border:1px solid var(--border);color:var(--tx);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+.tabs{display:flex;gap:24px;margin-bottom:32px;border-bottom:1px solid var(--border)}
+.tab{padding:12px 0;cursor:pointer;color:var(--mut);font-size:14px;font-weight:500;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:var(--g);border-color:var(--g)}
+.section{display:none}
+.section.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.grid.cols2{grid-template-columns:repeat(2,1fr)}
+.grid.cols3{grid-template-columns:repeat(3,1fr)}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .2s}
+.metric:hover{border-color:var(--g);background:var(--card2)}
+.metric small{display:block;color:var(--mut);font-size:12px;margin-bottom:8px}
+.metric b{display:block;font-size:28px;font-weight:600;margin:4px 0}
+.metric.up b{color:var(--g)}
+.metric.dn b{color:var(--r)}
+.metric .sub{color:var(--mut);font-size:12px;margin-top:4px}
+.section-title{font-size:20px;font-weight:600;margin-bottom:20px;color:var(--tx)}
+.chart-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.chart-container h3{font-size:14px;color:var(--mut);margin-bottom:12px}
+.mini-list{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.mini-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.mini-row:last-child{border:0}
+.mini-row .label{display:flex;flex-direction:column}
+.mini-row .label b{font-size:13px;color:var(--tx);margin-bottom:2px}
+.mini-row .label small{font-size:11px;color:var(--mut)}
+.mini-row .value{text-align:right;font-weight:500;font-size:14px}
+.mini-row .value.up{color:var(--g)}
+.mini-row .value.dn{color:var(--r)}
+.coin-bar{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card2);border-radius:8px;margin-bottom:8px}
+.coin-bar .icon{width:32px;height:32px;background:linear-gradient(135deg,var(--b),var(--p));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff}
+.coin-bar .name{flex:0 0 100px;font-weight:500;font-size:13px}
+.coin-bar .bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.coin-bar .bar span{display:block;height:100%;background:var(--g);border-radius:4px}
+.coin-bar .value{flex:0 0 60px;text-align:right;font-weight:500;font-size:13px}
+.coin-bar .value.dn{color:var(--r)}
+.trade-row{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.trade-row .field{display:flex;flex-direction:column}
+.trade-row .field small{color:var(--mut);font-size:11px;margin-bottom:4px}
+.trade-row .field b{color:var(--tx);font-size:13px}
+.trade-row .field .tag{display:inline-block;width:fit-content;background:var(--g);color:var(--bg);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-top:4px}
+.trade-row .field .tag.loss{background:var(--r)}
+.search-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px}
+.search-box input{background:transparent;border:0;color:var(--tx);width:100%;font-size:13px}
+.search-box input::placeholder{color:var(--mut)}
+.badges{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.badge{background:var(--card);border:1px solid var(--border);color:var(--tx);padding:8px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+.badge.active{background:var(--g);color:var(--bg);border-color:var(--g)}
+.exit-breakdown{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.exit-item{background:var(--card2);border-radius:8px;padding:16px;text-align:center}
+.exit-item .num{font-size:24px;font-weight:600;color:var(--g);margin-bottom:4px}
+.exit-item .label{font-size:12px;color:var(--mut)}
+@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}.trade-row{grid-template-columns:1fr}.exit-breakdown{grid-template-columns:1fr}}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.header{flex-direction:column;gap:12px}.tabs{overflow-x:auto;gap:16px}.container{padding:12px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">✱ <span>TRADEPRO</span></div>
+<div class="header-right">
+<span class="timestamp"><span class="dot"></span><span id="time">--:--:--</span></span>
+<button class="refresh" onclick="location.reload()">🔄 Refresh</button>
 </div>
-<div class="grid">
- <div class="card c5"><h3>P&amp;L per Trade</h3><div class="bars" id="bars"></div></div>
- <div class="card c4"><h3>Win / Loss</h3><div id="donut"></div><div class="legend" id="leg"></div></div>
- <div class="card c3"><h3>Performance</h3><div id="periods"></div></div>
- <div class="card c6"><h3>Growth Trajectory</h3><div id="growth"></div><div class="big" id="gBig"></div></div>
- <div class="card c6"><h3>Active Positions</h3><div id="openList"></div></div>
- <div class="card c12"><h3>Closed Trades</h3><div class="tw"><table id="tClosed"></table></div></div>
- <div class="card c12"><h3>Active Positions · Details</h3><div class="tw"><table id="tOpen"></table></div></div>
-</div></div>
-<script>
-    const closedTrades = [
-      {
-        symbol: 'RARE/USDT #1',
-        position: 'SHORT',
-        leverage: 10,
-        entry: 0.02270,
-        exit: 0.01795,
-        qty: 8073,
-        realCapital: 18.31,
-        notional: 183.10,
-        pnl: 38.261,
-        roi: 209.00,
-        duration: '1d 21h',
-        status: 'WIN',
-        openTime: '28/09 04:44',
-        closeTime: '30/09 01:50',
-        date: '2026-09-30'
-      },
-      {
-        symbol: 'INX/USDT',
-        position: 'LONG',
-        leverage: 10,
-        entry: 0.5742,
-        exit: 0.7360,
-        qty: 333,
-        realCapital: 25.00,
-        notional: 250.00,
-        pnl: 53.866,
-        roi: 215.41,
-        duration: '4d 21h',
-        status: 'WIN',
-        openTime: '23/09 01:08',
-        closeTime: '27/09 22:48',
-        date: '2026-09-27'
-      },
-      {
-        symbol: 'RARE/USDT #2',
-        position: 'SHORT',
-        leverage: 10,
-        entry: 0.02250,
-        exit: 0.02416,
-        qty: 5994,
-        realCapital: 13.487,
-        notional: 134.87,
-        pnl: -9.939,
-        roi: -73.71,
-        duration: '16h',
-        status: 'LOSS',
-        openTime: '27/09 12:41',
-        closeTime: '28/09 04:34',
-        date: '2026-09-28'
-      },
-      {
-        symbol: 'WLD/USDT',
-        position: 'LONG',
-        leverage: 10,
-        entry: 0.56,
-        exit: 0.55,
-        qty: 197,
-        realCapital: 11.02,
-        notional: 110.2,
-        pnl: -2.163,
-        roi: -19.63,
-        duration: '1h 15m',
-        status: 'LOSS',
-        openTime: '28/09 01:51',
-        closeTime: '28/09 03:06',
-        date: '2026-09-28'
-      },
-      {
-        symbol: 'ENA/USDT',
-        position: 'LONG',
-        leverage: 10,
-        entry: 0.29,
-        exit: 0.28,
-        qty: 428,
-        realCapital: 12.43,
-        notional: 124.3,
-        pnl: -3.496,
-        roi: -28.1,
-        duration: '1h 28m',
-        status: 'LOSS',
-        openTime: '28/09 01:38',
-        closeTime: '28/09 03:06',
-        date: '2026-09-28'
-      }
-    ];
+</div>
 
-    const openTrades = [
-      {
-        symbol: 'RECALL/USDT',
-        position: 'LONG',
-        leverage: 10,
-        entry: 0.04714,
-        current: 0.04892,
-        liqPrice: 0.04322,
-        target: 0.08000,
-        qty: 6662,
-        realMargin: 30.821,
-        size: 325.905,
-        pnl: 11.885,
-        roe: 38.56,
-        status: 'OPEN',
-        openTime: '30/09',
-        date: '2026-09-30'
-      },
-      {
-        symbol: 'STBL/USDT',
-        position: 'LONG',
-        leverage: 10,
-        entry: 0.02676,
-        current: 0.02652,
-        liqPrice: 0.0245,
-        target: 0.05300,
-        qty: 10103,
-        realMargin: 26.922,
-        size: 267.932,
-        pnl: -2.420,
-        roe: -8.99,
-        status: 'OPEN',
-        openTime: '01/10',
-        date: '2026-10-01'
-      },
-      {
-        symbol: 'YB/USDT',
-        position: 'LONG',
-        leverage: 5,
-        entry: 0.08701,
-        current: 0.08536,
-        liqPrice: 0.0709,
-        target: 0.40000,
-        qty: 1208,
-        realMargin: 21.045,
-        size: 103.115,
-        pnl: -1.993,
-        roe: -9.47,
-        status: 'OPEN',
-        openTime: '01/10 12:03',
-        date: '2026-10-01'
-      },
-      {
-        symbol: 'SIREN/USDT',
-        position: 'LONG',
-        leverage: 7,
-        entry: 0.02310,
-        current: 0.02317,
-        liqPrice: 0.02014,
-        target: 0.03000,
-        qty: 4652,
-        realMargin: 15.390,
-        size: 107.787,
-        pnl: 0.326,
-        roe: 2.12,
-        status: 'OPEN',
-        openTime: '01/10 04:45',
-        date: '2026-10-01'
-      },
-      {
-        symbol: 'DEXE/USDT',
-        position: 'LONG',
-        leverage: 7,
-        entry: 2.075,
-        current: 2.076,
-        liqPrice: 1.809,
-        target: 2.400,
-        qty: 52.59,
-        realMargin: 15.628,
-        size: 109.177,
-        pnl: 0.053,
-        roe: 0.34,
-        status: 'OPEN',
-        openTime: '02/10 02:13',
-        date: '2026-10-02'
-      }
-    ];
-const f=(n,d=3)=>(n>=0?'+':'')+n.toFixed(d),cl=n=>n>=0?'up':'dn',sum=(a,k)=>a.reduce((s,t)=>s+t[k],0);
-setInterval(()=>document.getElementById('timestamp').textContent=new Date().toLocaleTimeString('en-GB'),1000);
-const $=id=>document.getElementById(id);
+<div class="tabs">
+<div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+<div class="tab" onclick="switchTab('trades')">📋 Trades</div>
+<div class="tab" onclick="switchTab('analytics')">📈 Analytics</div>
+</div>
+
+<!-- DASHBOARD SECTION -->
+<div id="dashboard" class="section active">
+<div class="grid cols3">
+<div class="metric up"><small>Total P&L (USDT)</small><b id="totalPnl">+76.49</b><span class="sub" id="totalSub">5 closed · 4 open</span></div>
+<div class="metric"><small>Win Rate</small><b id="winRate">40%</b><span class="sub" id="winSub">2 wins / 5 trades</span></div>
+<div class="metric"><small>Total Capital</small><b id="capTotal">148.81</b><span class="sub">All positions</span></div>
+<div class="metric up"><small>Realized P&L</small><b id="realizedPnl">+76.49</b><span class="sub">Closed trades</span></div>
+<div class="metric up"><small>Unrealized P&L</small><b id="unrealizedPnl">+9.89</b><span class="sub">Open positions</span></div>
+<div class="metric"><small>Profit Factor</small><b id="profitFactor">5.91</b><span class="sub">Wins / Losses</span></div>
+</div>
+
+<div class="section-title">Open Positions</div>
+<div id="openPositions" class="mini-list"></div>
+
+<div class="section-title">P&L Breakdown by Coin</div>
+<div id="coinPerformance" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px"></div>
+
+<div class="section-title">Performance</div>
+<div class="grid cols3">
+<div class="chart-container">
+<h3>Weekly P&L</h3>
+<div id="weeklyChart" style="height:120px"></div>
+</div>
+<div class="chart-container">
+<h3>Monthly P&L</h3>
+<div id="monthlyChart" style="height:120px"></div>
+</div>
+<div class="chart-container">
+<h3>Equity Curve</h3>
+<div id="equityChart" style="height:120px"></div>
+</div>
+</div>
+</div>
+
+<!-- TRADES SECTION -->
+<div id="trades" class="section">
+<div class="search-box">
+<input type="text" id="searchTrade" placeholder="Search symbol, setup, exchange..." onkeyup="filterTrades()">
+</div>
+<div class="badges">
+<span class="badge active" onclick="setTradeFilter('all')">All</span>
+<span class="badge" onclick="setTradeFilter('win')">Wins</span>
+<span class="badge" onclick="setTradeFilter('loss')">Losses</span>
+<span class="badge" onclick="setTradeFilter('open')">Open</span>
+</div>
+<div id="tradesList"></div>
+</div>
+
+<!-- ANALYTICS SECTION -->
+<div id="analytics" class="section">
+<div class="grid cols3">
+<div class="metric"><small>Total Profit</small><b id="totalProfit">+92.13</b><span class="sub">Known P&L</span></div>
+<div class="metric dn"><small>Total Loss</small><b id="totalLoss">-15.60</b><span class="sub">All losses</span></div>
+<div class="metric"><small>Loss Rate</small><b id="lossRate">60.0%</b><span class="sub">3 losses / 5</span></div>
+<div class="metric"><small>Avg Profit</small><b id="avgProfit">46.06</b><span class="sub">Per winning trade</span></div>
+<div class="metric"><small>Avg Loss</small><b id="avgLoss">5.20</b><span class="sub">Per losing trade</span></div>
+<div class="metric dn"><small>Max Drawdown</small><b id="maxDD">-15.60</b><span class="sub">Peak to trough</span></div>
+<div class="metric"><small>Avg P&L %</small><b id="avgPct">+94.08%</b><span class="sub">ROI average</span></div>
+<div class="metric"><small>Avg Holding</small><b id="avgHold">1d 14h</b><span class="sub">Trade duration</span></div>
+<div class="metric"><small>Trades</small><b id="tradeCount">5 / 4</b><span class="sub">Closed / Open</span></div>
+</div>
+
+<div class="section-title">Exit Outcomes</div>
+<div class="exit-breakdown">
+<div class="exit-item"><div class="num" id="tpHit">5</div><div class="label">TP Hit</div></div>
+<div class="exit-item"><div class="num" id="slHit">0</div><div class="label">SL Hit</div></div>
+<div class="exit-item"><div class="num" id="manual">0</div><div class="label">Manual Close</div></div>
+</div>
+
+<div class="section-title" style="margin-top:24px">Exit Outcomes Distribution</div>
+<div id="exitChart" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;height:200px;margin-bottom:24px"></div>
+</div>
+
+</div>
+
+<script>
+const closedTrades = [
+  {symbol:'RARE/USDT #1',position:'SHORT',leverage:10,entry:0.02270,exit:0.01795,realCapital:18.31,notional:183.10,qty:8073,pnl:38.261,roi:209.00,status:'WIN',openTime:'28/09 04:44',closeTime:'30/09 01:50',duration:'1d 21h',date:'2026-09-30'},
+  {symbol:'INX/USDT',position:'LONG',leverage:10,entry:0.5742,exit:0.7360,realCapital:25.00,notional:250.00,qty:333,pnl:53.866,roi:215.41,status:'WIN',openTime:'23/09 01:08',closeTime:'27/09 22:48',duration:'4d 21h',date:'2026-09-27'},
+  {symbol:'RARE/USDT #2',position:'SHORT',leverage:10,entry:0.02250,exit:0.02416,realCapital:13.487,notional:134.87,qty:5994,pnl:-9.939,roi:-73.71,status:'LOSS',openTime:'27/09 12:41',closeTime:'28/09 04:34',duration:'16h',date:'2026-09-28'},
+  {symbol:'WLD/USDT',position:'LONG',leverage:10,entry:0.56,exit:0.55,realCapital:11.02,notional:110.20,qty:197,pnl:-2.163,roi:-19.63,status:'LOSS',openTime:'28/09 01:51',closeTime:'28/09 03:06',duration:'1h 15m',date:'2026-09-28'},
+  {symbol:'ENA/USDT',position:'LONG',leverage:10,entry:0.29,exit:0.28,realCapital:12.43,notional:124.30,qty:428,pnl:-3.496,roi:-28.10,status:'LOSS',openTime:'28/09 01:38',closeTime:'28/09 03:06',duration:'1h 28m',date:'2026-09-28'}
+];
+
+const openTrades = [
+  {symbol:'RECALL/USDT',position:'LONG',leverage:10,entry:0.04714,current:0.04892,liqPrice:0.04322,target:0.08000,qty:6662,realMargin:30.821,size:325.905,pnl:11.885,roe:38.56,status:'OPEN',openTime:'30/09',date:'2026-09-30'},
+  {symbol:'STBL/USDT',position:'LONG',leverage:10,entry:0.02676,current:0.02652,liqPrice:0.02450,target:0.05300,qty:10103,realMargin:26.922,size:267.932,pnl:-2.420,roe:-8.99,status:'OPEN',openTime:'01/10',date:'2026-10-01'},
+  {symbol:'YB/USDT',position:'LONG',leverage:5,entry:0.08701,current:0.08536,liqPrice:0.0709,target:0.40000,qty:1208,realMargin:21.045,size:103.115,pnl:-1.993,roe:-9.47,status:'OPEN',openTime:'01/10 12:03',date:'2026-10-01'},
+  {symbol:'SIREN/USDT',position:'LONG',leverage:7,entry:0.02310,current:0.02317,liqPrice:0.02014,target:0.03000,qty:4652,realMargin:15.390,size:107.787,pnl:0.326,roe:2.12,status:'OPEN',openTime:'01/10 04:45',date:'2026-10-01'},
+  {symbol:'DEXE/USDT',position:'LONG',leverage:7,entry:2.075,current:2.076,liqPrice:1.809,target:2.400,qty:52.59,realMargin:15.628,size:109.177,pnl:0.053,roe:0.34,status:'OPEN',openTime:'02/10 02:13',date:'2026-10-02'}
+];
+
+let tradeFilter='all';
+const $=(id)=>document.getElementById(id);
+const cl=n=>n>=0?'up':'dn',f=(n,d=2)=>(n>=0?'+':'')+n.toFixed(d),sum=(a,k)=>a.reduce((s,t)=>s+t[k],0);
+setInterval(()=>$('time').textContent=new Date().toLocaleTimeString('en-GB'),1000);
+
 const cP=sum(closedTrades,'pnl'),oP=sum(openTrades,'pnl'),tot=cP+oP,cap=sum(closedTrades,'realCapital')+sum(openTrades,'realMargin');
-const wins=closedTrades.filter(t=>t.pnl>0).length,losses=closedTrades.length-wins,wr=Math.round(wins/closedTrades.length*100);
-const [ti,td]=tot.toFixed(2).split('.');
-$('hTotal').innerHTML=(tot>=0?'+':'')+ti+'<i>.'+td+'</i>';
-$('hSub').textContent=`${closedTrades.length+openTrades.length} positions · ${openTrades.length} active`;
-$('minis').innerHTML=[['Win Rate',wr+'%'],['Closed P&L',f(cP,2)],['Open P&L',f(oP,2)],['Total Capital',cap.toFixed(2)]].map(([a,b])=>`<div class="mini"><small>${a}</small><b>${b}</b></div>`).join('');
-const mx=Math.max(...closedTrades.map(t=>Math.abs(t.pnl)));
-$('bars').innerHTML=closedTrades.map((t,i)=>`<div class="bar ${i==0?'hi':''}">${i==0?`<span class="tip">${f(t.pnl,1)}</span>`:''}<div style="height:${Math.max(8,Math.abs(t.pnl)/mx*130)}px;${t.pnl<0?'background:#3a1820':''}"></div>${t.symbol.split('/')[0].slice(0,5)}</div>`).join('');
-const R=80,C=Math.PI*R,wl=wins/closedTrades.length*C;
-$('donut').innerHTML=`<svg viewBox="0 0 200 110" width="100%"><defs><linearGradient id="gd"><stop offset="0" stop-color="#e45cff"/><stop offset="1" stop-color="#8a2be2"/></linearGradient></defs><path d="M20 100A80 80 0 0 1 180 100" fill="none" stroke="#3a3a40" stroke-width="22" stroke-linecap="round"/><path d="M20 100A80 80 0 0 1 180 100" fill="none" stroke="url(#gd)" stroke-width="22" stroke-linecap="round" stroke-dasharray="${wl} ${C}"/><text x="100" y="98" text-anchor="middle" fill="#fff" font-size="26">${wr}%</text></svg>`;
-$('leg').innerHTML=`<div><span class="sq" style="background:#e45cff"></span>Wins<b>${wins}</b></div><div><span class="sq" style="background:#3a3a40"></span>Losses<b>${losses}</b></div><div><span class="sq" style="background:#6b7cff"></span>Active<b>${openTrades.length}</b></div><div><span class="sq" style="background:#2fd5a0"></span>Total Capital<b>${cap.toFixed(1)}</b></div>`;
-const now=new Date('2026-10-01'),pd=t=>new Date(t.date);
-const per=(n,fn)=>{const a=closedTrades.filter(fn);return `<div class="per"><div><small>${n}</small><b class="${cl(sum(a,'pnl'))}">${f(sum(a,'pnl'),2)}</b></div><small>${a.length} trades</small></div>`};
-$('periods').innerHTML=per('Weekly',t=>(now-pd(t))/864e5<=7)+per('Monthly',t=>pd(t).getMonth()==now.getMonth())+per('Yearly',t=>pd(t).getFullYear()==now.getFullYear());
-let run=0;const pts=[0,...[...closedTrades].reverse().map(t=>run+=t.pnl)],gm=Math.max(...pts)||1,gn=Math.min(...pts);
-const xy=pts.map((v,i)=>[i/(pts.length-1)*400,90-(v-gn)/(gm-gn||1)*80]);
-const ln=xy.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');
-$('growth').innerHTML=`<svg viewBox="0 0 400 100" width="100%" preserveAspectRatio="none" style="height:110px"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fd36b" stop-opacity=".35"/><stop offset="1" stop-color="#2fd36b" stop-opacity="0"/></linearGradient></defs><path d="${ln} L400 100 L0 100Z" fill="url(#ga)"/><path d="${ln}" fill="none" stroke="#2fd36b" stroke-width="2"/></svg>`;
-$('gBig').innerHTML=`<span class="up">${f(cP,2)}</span> <small style="font-size:13px;color:var(--mut)">USDT closed</small>`;
-$('openList').innerHTML=openTrades.map(t=>`<div class="row"><div><b>${t.symbol}</b><small>${t.position} ${t.leverage}x · Entry ${t.entry}</small></div><div style="text-align:right"><b class="${cl(t.pnl)}">${f(t.pnl)}</b><small class="${cl(t.roe)}">${f(t.roe,2)}%</small></div></div>`).join('');
-$('tClosed').innerHTML='<tr><th>Symbol<th>Pos<th>Lev<th>Capital<th>Profit/Loss<th>Entry<th>Exit<th>Notional<th>Qty<th>ROI<th>Status<th>Open<th>Close<th>Duration</tr>'+closedTrades.map(t=>`<tr><td><b>${t.symbol}</b><td>${t.position}<td>${t.leverage}x<td><span class="cap">${t.realCapital.toFixed(2)}</span><td><span class="tag ${cl(t.pnl)}">${f(t.pnl)}</span><td>${t.entry}<td>${t.exit}<td>${t.notional.toFixed(2)}<td>${t.qty}<td class="${cl(t.roi)}">${f(t.roi,2)}%<td><span class="tag ${t.pnl>0?'up':'dn'}">${t.pnl>0?'WIN':'LOSS'}</span><td>${t.openTime}<td>${t.closeTime}<td>${t.duration}</tr>`).join('');
-$('tOpen').innerHTML='<tr><th>Symbol<th>Pos<th>Lev<th>Entry<th>Current<th>Margin<th>Size<th>Qty<th>Liq.<th>Target<th>P&L<th>ROE<th>Open</tr>'+openTrades.map(t=>`<tr><td><b>${t.symbol}</b><td>${t.position}<td>${t.leverage}x<td>${t.entry}<td>${t.current}<td><span class="cap">${t.realMargin.toFixed(3)}</span><td>${t.size}<td>${t.qty}<td>${t.liqPrice}<td>${t.target}<td class="${cl(t.pnl)}">${f(t.pnl)}<td class="${cl(t.roe)}">${f(t.roe,2)}%<td>${t.openTime}</tr>`).join('');
-</script></body></html>
+const wins=closedTrades.filter(t=>t.pnl>0).length,losses=closedTrades.length-wins,wr=Math.round(wins/(closedTrades.length||1)*100);
+const profit=sum(closedTrades.filter(t=>t.pnl>0),'pnl'),loss=Math.abs(sum(closedTrades.filter(t=>t.pnl<0),'pnl'));
+const pf=loss>0?profit/loss:0,avgP=wins>0?profit/wins:0,avgL=losses>0?loss/losses:0;
+
+$('totalPnl').textContent=f(tot);
+$('totalPnl').parentElement.className='metric '+cl(tot);
+$('totalSub').textContent=`${closedTrades.length} closed · ${openTrades.length} open`;
+$('winRate').textContent=wr+'%';
+$('winSub').textContent=`${wins} wins / ${closedTrades.length} trades`;
+$('capTotal').textContent=cap.toFixed(2);
+$('realizedPnl').textContent=f(cP);
+$('realizedPnl').parentElement.className='metric '+cl(cP);
+$('unrealizedPnl').textContent=f(oP);
+$('unrealizedPnl').parentElement.className='metric '+cl(oP);
+$('profitFactor').textContent=pf.toFixed(2);
+$('totalProfit').textContent=f(profit);
+$('totalLoss').textContent=f(-loss);
+$('lossRate').textContent=(Math.round(losses/(closedTrades.length||1)*100))+'%';
+$('avgProfit').textContent=avgP.toFixed(2);
+$('avgLoss').textContent=avgL.toFixed(2);
+$('maxDD').textContent=f(-loss);
+$('avgPct').textContent=f(sum(closedTrades,'roi')/closedTrades.length)+'%';
+$('avgHold').textContent='1d 14h';
+$('tradeCount').textContent=`${closedTrades.length} / ${openTrades.length}`;
+
+$('openPositions').innerHTML=openTrades.map(t=>`<div class="mini-row"><div class="label"><b>${t.symbol}</b><small>${t.position} ${t.leverage}x · Entry ${t.entry}</small></div><div class="value ${cl(t.pnl)}">${f(t.pnl)}</div></div>`).join('');
+
+const coins={};closedTrades.forEach(t=>{if(!coins[t.symbol])coins[t.symbol]={pnl:0};coins[t.symbol].pnl+=t.pnl});
+const sortedCoins=Object.entries(coins).sort((a,b)=>b[1].pnl-a[1].pnl);
+const maxCoin=Math.max(...sortedCoins.map(c=>Math.abs(c[1].pnl)));
+$('coinPerformance').innerHTML=sortedCoins.map(([sym,d])=>{const w=Math.abs(d.pnl)/maxCoin*100;return `<div class="coin-bar"><div class="icon">${sym[0]}</div><div class="name">${sym}</div><div class="bar"><span style="width:${Math.max(5,w)}%;background:${d.pnl>=0?'var(--g)':'var(--r)'}"></span></div><div class="value ${cl(d.pnl)}">${f(d.pnl)}</div></div>`}).join('');
+
+$('tpHit').textContent=closedTrades.length;
+$('slHit').textContent='0';
+$('manual').textContent='0';
+
+function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));event.target.classList.add('active');$(tab).classList.add('active')}
+
+function setTradeFilter(f){tradeFilter=f;document.querySelectorAll('.badge').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderTrades()}
+
+function filterTrades(){renderTrades()}
+
+function renderTrades(){const q=$('searchTrade').value.toLowerCase();let trades=closedTrades.map(t=>({...t,type:'closed'}));if(tradeFilter==='open'||tradeFilter==='all')trades=[...trades,...openTrades.map(t=>({...t,type:'open'}))];if(tradeFilter==='win')trades=trades.filter(t=>t.pnl>0);if(tradeFilter==='loss')trades=trades.filter(t=>t.pnl<0);if(tradeFilter==='open')trades=trades.filter(t=>t.type==='open');trades=trades.filter(t=>t.symbol.toLowerCase().includes(q));$('tradesList').innerHTML=trades.map(t=>`<div class="trade-row"><div class="field"><small>SYMBOL</small><b>${t.symbol}</b><span class="tag ${t.pnl>=0?'':'loss'}">${t.position} ${t.leverage}x</span></div><div class="field"><small>ENTRY / EXIT</small><b>${t.entry}${t.type==='closed'?` → ${t.exit}`:` / ${t.current||'N/A'}`}</b><span class="tag">${t.type==='open'?'OPEN':t.pnl>0?'WIN':'LOSS'}</span></div><div class="field"><small>PROFIT/LOSS</small><b class="${cl(t.pnl)}">${f(t.pnl)}</b><small class="${cl(t.roi||t.roe)}">${f(t.roi||t.roe,2)}% ROI</small></div></div>`).join('')}
+
+renderTrades();
+</script>
+</body>
+</html>
