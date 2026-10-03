@@ -12,49 +12,49 @@
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 .container{max-width:800px;margin:0 auto;padding:16px}
-.greeting-section{margin-bottom:24px}
-.date-label{font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:600}
-.greeting-title{font-size:48px;font-weight:700;margin-bottom:12px;line-height:1.1;letter-spacing:-1px}
-.greeting-sub{font-size:16px;color:var(--mut);margin-bottom:24px}
-.action-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
-.btn{padding:16px;border-radius:16px;border:1px solid var(--border);font-size:16px;font-weight:500;cursor:pointer;transition:all .2s;height:56px;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-time{background:transparent;color:var(--tx)}
+.greeting-section{margin-bottom:32px}
+.date-label{font-size:13px;color:var(--green);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;font-weight:600}
+.greeting-title{font-size:52px;font-weight:700;margin-bottom:16px;line-height:1.1;letter-spacing:-1px}
+.greeting-sub{font-size:16px;color:var(--mut);margin-bottom:28px;line-height:1.5}
+.action-buttons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:40px}
+.btn{padding:18px 20px;border-radius:18px;border:1px solid var(--border);font-size:16px;font-weight:500;cursor:pointer;transition:all .2s;height:60px;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-time{background:transparent;color:var(--tx);font-size:16px}
 .btn-time:hover{background:var(--card);border-color:var(--green)}
-.btn-add{background:var(--green);color:#0f1419;font-weight:600;border:0}
+.btn-add{background:var(--green);color:#0f1419;font-weight:600;border:0;font-size:17px}
 .btn-add:hover{opacity:.9;transform:scale(1.02)}
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-.metric-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;transition:all .2s}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;position:relative;transition:all .2s;min-height:160px;display:flex;flex-direction:column;justify-content:space-between}
 .metric-card:hover{border-color:var(--green);background:#232d3a}
-.metric-icon{position:absolute;top:16px;right:16px;width:48px;height:48px;background:rgba(47,213,160,.1);border:1px solid rgba(47,213,160,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--green)}
-.metric-label{font-size:12px;color:var(--mut);text-transform:capitalize;margin-bottom:8px;text-transform:none}
-.metric-value{font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-.5px}
-.metric-sub{font-size:12px;color:var(--mut)}
+.metric-icon-box{position:absolute;top:20px;right:20px;width:64px;height:64px;background:rgba(47,213,160,.12);border:2px solid var(--green);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px}
+.metric-label{font-size:14px;color:var(--mut);margin-bottom:12px;font-weight:500}
+.metric-value{font-size:38px;font-weight:700;margin-bottom:12px;letter-spacing:-1px;line-height:1}
+.metric-sub{font-size:13px;color:var(--mut);line-height:1.4}
 .nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0);z-index:100}
-.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 0;cursor:pointer;color:var(--mut);font-size:11px;text-align:center;gap:6px;transition:all .2s;text-decoration:none;min-height:64px}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 0;cursor:pointer;color:var(--mut);font-size:11px;text-align:center;gap:6px;transition:all .2s;text-decoration:none;min-height:64px;font-weight:500}
 .nav-item.active{color:var(--green)}
-.nav-item icon{font-size:20px}
+.nav-item icon{font-size:22px}
 .tabs-container{display:none}
 .tabs-container.active{display:block}
-.trade-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.trade-field{display:flex;flex-direction:column;gap:4px}
-.trade-field-label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
-.trade-field-value{font-size:14px;font-weight:600;color:var(--tx)}
+.trade-row{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.trade-field{display:flex;flex-direction:column;gap:6px}
+.trade-field-label{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;font-weight:500}
+.trade-field-value{font-size:16px;font-weight:600;color:var(--tx)}
 .trade-field-value.loss{color:var(--red)}
 .trade-field-value.gain{color:var(--green)}
-.trade-tag{display:inline-block;width:fit-content;background:rgba(47,213,160,.1);color:var(--green);padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;margin-top:4px;border:1px solid rgba(47,213,160,.3)}
-.analytics-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.analytics-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
-.analytics-stat-label{font-size:12px;color:var(--mut);margin-bottom:8px}
-.analytics-stat-value{font-size:24px;font-weight:700;letter-spacing:-.5px}
-.settings-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.trade-tag{display:inline-block;width:fit-content;background:rgba(47,213,160,.1);color:var(--green);padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;margin-top:6px;border:1px solid rgba(47,213,160,.3)}
+.analytics-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.analytics-stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+.analytics-stat-label{font-size:13px;color:var(--mut);margin-bottom:10px;font-weight:500}
+.analytics-stat-value{font-size:28px;font-weight:700;letter-spacing:-.5px}
+.settings-item{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
 .settings-label{display:flex;flex-direction:column;gap:4px}
-.settings-label-main{font-size:14px;font-weight:600;color:var(--tx)}
-.settings-label-sub{font-size:12px;color:var(--mut)}
-.toggle{width:40px;height:24px;background:rgba(47,213,160,.3);border-radius:12px;cursor:pointer;transition:all .2s;position:relative}
+.settings-label-main{font-size:15px;font-weight:600;color:var(--tx)}
+.settings-label-sub{font-size:13px;color:var(--mut)}
+.toggle{width:42px;height:26px;background:rgba(47,213,160,.3);border-radius:13px;cursor:pointer;transition:all .2s;position:relative}
 .toggle.active{background:var(--green)}
-.toggle::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:10px;top:2px;left:2px;transition:all .2s}
+.toggle::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:11px;top:2px;left:2px;transition:all .2s}
 .toggle.active::after{left:18px}
-@media(max-width:640px){.greeting-title{font-size:32px}.metric-card{padding:20px}.metric-value{font-size:28px}.action-buttons{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.greeting-title{font-size:36px}.metric-card{padding:20px;min-height:140px}.metric-value{font-size:32px}.action-buttons{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -75,73 +75,93 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div id="dashboard-tab" class="tabs-container active">
 <div class="metrics-grid">
 <div class="metric-card">
-<div class="metric-icon">📊</div>
+<div class="metric-icon-box">📊</div>
+<div>
 <div class="metric-label">Total trades</div>
 <div class="metric-value">9</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">📈</div>
+<div class="metric-icon-box">📈</div>
+<div>
 <div class="metric-label">Open positions</div>
 <div class="metric-value">5</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">✓</div>
+<div class="metric-icon-box">✓</div>
+<div>
 <div class="metric-label">Closed trades</div>
 <div class="metric-value">5</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">💼</div>
+<div class="metric-icon-box">💼</div>
+<div>
 <div class="metric-label">Total investment</div>
 <div class="metric-value">$186.78</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">📈</div>
+<div class="metric-icon-box">📈</div>
+<div>
 <div class="metric-label">Realized P&L</div>
 <div class="metric-value">+$76.53</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">📊</div>
+<div class="metric-icon-box">📊</div>
+<div>
 <div class="metric-label">Unrealized P&L</div>
 <div class="metric-value">—</div>
 <div class="metric-sub">Connect a verified market price feed</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">🛡️</div>
+<div class="metric-icon-box">🛡️</div>
+<div>
 <div class="metric-label">Win rate</div>
 <div class="metric-value">40.0%</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">📊</div>
+<div class="metric-icon-box">📊</div>
+<div>
 <div class="metric-label">Average P&L</div>
 <div class="metric-value">$15.31</div>
 <div class="metric-sub">From saved trade records</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">⏱️</div>
+<div class="metric-icon-box">⏱️</div>
+<div>
 <div class="metric-label">Today's P&L</div>
 <div class="metric-value">$0.00</div>
 <div class="metric-sub">Known, realized P&L today</div>
 </div>
+</div>
 
 <div class="metric-card">
-<div class="metric-icon">📅</div>
+<div class="metric-icon-box">📅</div>
+<div>
 <div class="metric-label">Monthly P&L</div>
 <div class="metric-value">$0.00</div>
 <div class="metric-sub">Known, realized P&L this month</div>
+</div>
 </div>
 </div>
 </div>
@@ -149,7 +169,7 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <!-- TRADES TAB -->
 <div id="trades-tab" class="tabs-container">
 <div style="margin-bottom:32px">
-<h3 style="font-size:18px;margin-bottom:16px">Your Trades</h3>
+<h3 style="font-size:20px;margin-bottom:20px;font-weight:600">Your Trades</h3>
 
 <div class="trade-row">
 <div class="trade-field">
@@ -160,7 +180,7 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="trade-field">
 <div class="trade-field-label">Entry / Exit</div>
 <div class="trade-field-value">0.02270 → 0.01795</div>
-<div class="trade-field-label" style="margin-top:8px">Status</div>
+<div class="trade-field-label" style="margin-top:10px">Status</div>
 <div class="trade-field-value gain">WIN</div>
 </div>
 </div>
@@ -174,7 +194,7 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="trade-field">
 <div class="trade-field-label">Entry / Exit</div>
 <div class="trade-field-value">0.5742 → 0.7360</div>
-<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-label" style="margin-top:10px">P&L</div>
 <div class="trade-field-value gain">+$53.87 (+215%)</div>
 </div>
 </div>
@@ -188,36 +208,8 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="trade-field">
 <div class="trade-field-label">Entry / Current</div>
 <div class="trade-field-value">0.08701 / 0.08536</div>
-<div class="trade-field-label" style="margin-top:8px">P&L</div>
+<div class="trade-field-label" style="margin-top:10px">P&L</div>
 <div class="trade-field-value loss">-$1.99 (-9.47%)</div>
-</div>
-</div>
-
-<div class="trade-row">
-<div class="trade-field">
-<div class="trade-field-label">Symbol</div>
-<div class="trade-field-value">SIREN/USDT</div>
-<div class="trade-tag">LONG 7x</div>
-</div>
-<div class="trade-field">
-<div class="trade-field-label">Entry / Current</div>
-<div class="trade-field-value">0.02310 / 0.02317</div>
-<div class="trade-field-label" style="margin-top:8px">P&L</div>
-<div class="trade-field-value gain">+$0.33 (+2.12%)</div>
-</div>
-</div>
-
-<div class="trade-row">
-<div class="trade-field">
-<div class="trade-field-label">Symbol</div>
-<div class="trade-field-value">DEXE/USDT</div>
-<div class="trade-tag">LONG 7x</div>
-</div>
-<div class="trade-field">
-<div class="trade-field-label">Entry / Current</div>
-<div class="trade-field-value">2.075 / 2.076</div>
-<div class="trade-field-label" style="margin-top:8px">P&L</div>
-<div class="trade-field-value gain">+$0.05 (+0.34%)</div>
 </div>
 </div>
 </div>
@@ -226,21 +218,21 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <!-- UPLOAD TAB -->
 <div id="upload-tab" class="tabs-container">
 <div style="text-align:center;padding:40px 20px;margin-bottom:32px">
-<div style="font-size:48px;margin-bottom:16px">☁️</div>
-<h3 style="font-size:18px;margin-bottom:8px">Upload Screenshots</h3>
-<p style="color:var(--mut);font-size:14px;margin-bottom:24px">Drop CoinDCX trade screenshots to auto-extract data</p>
-<div style="background:var(--card);border:2px dashed var(--border);border-radius:12px;padding:40px 20px;cursor:pointer">
-<p style="color:var(--mut)">Select or drag files here</p>
-<p style="color:var(--mut);font-size:12px;margin-top:8px">PNG, JPG, JPEG, WEBP (up to 10 MB)</p>
+<div style="font-size:56px;margin-bottom:20px">☁️</div>
+<h3 style="font-size:20px;margin-bottom:12px;font-weight:600">Upload Screenshots</h3>
+<p style="color:var(--mut);font-size:15px;margin-bottom:28px;line-height:1.6">Drop CoinDCX trade screenshots to auto-extract data</p>
+<div style="background:var(--card);border:2px dashed var(--border);border-radius:16px;padding:48px 20px;cursor:pointer">
+<p style="color:var(--mut);font-size:15px;font-weight:500">Select or drag files here</p>
+<p style="color:var(--mut);font-size:13px;margin-top:10px">PNG, JPG, JPEG, WEBP (up to 10 MB)</p>
 </div>
-<p style="color:var(--mut);font-size:12px;margin-top:24px">Browser OCR ready - images read locally with Tesseract</p>
+<p style="color:var(--mut);font-size:13px;margin-top:28px">Browser OCR ready - images read locally with Tesseract</p>
 </div>
 </div>
 
 <!-- ANALYTICS TAB -->
 <div id="analytics-tab" class="tabs-container">
 <div style="margin-bottom:32px">
-<h3 style="font-size:18px;margin-bottom:16px">Performance Analytics</h3>
+<h3 style="font-size:20px;margin-bottom:20px;font-weight:600">Performance Analytics</h3>
 
 <div class="analytics-row">
 <div class="analytics-stat">
@@ -291,7 +283,7 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <!-- SETTINGS TAB -->
 <div id="settings-tab" class="tabs-container">
 <div style="margin-bottom:32px">
-<h3 style="font-size:18px;margin-bottom:16px">Settings</h3>
+<h3 style="font-size:20px;margin-bottom:20px;font-weight:600">Settings</h3>
 
 <div class="settings-item">
 <div class="settings-label">
@@ -325,10 +317,10 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 <div class="toggle active" style="pointer-events:none"></div>
 </div>
 
-<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:24px">
-<div style="font-size:14px;font-weight:600;margin-bottom:8px">Account</div>
-<div style="font-size:12px;color:var(--mut);margin-bottom:12px">hemachandarm7-sketch</div>
-<button style="width:100%;padding:10px;background:var(--card);border:1px solid var(--border);color:var(--tx);border-radius:8px;cursor:pointer;font-size:14px">Sign Out</button>
+<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:28px">
+<div style="font-size:15px;font-weight:600;margin-bottom:10px">Account</div>
+<div style="font-size:13px;color:var(--mut);margin-bottom:14px">hemachandarm7-sketch</div>
+<button style="width:100%;padding:12px;background:var(--card);border:1px solid var(--border);color:var(--tx);border-radius:12px;cursor:pointer;font-size:15px;font-weight:500">Sign Out</button>
 </div>
 </div>
 </div>
