@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>ORBIT - Trading Dashboard</title>
 <style>
 :root{--bg:#0f1419;--card:#1a2332;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--green:#2fd5a0;--red:#ff5468}
@@ -54,10 +55,14 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 .toggle.active{background:var(--green)}
 .toggle::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:11px;top:2px;left:2px;transition:all .2s}
 .toggle.active::after{left:18px}
+.cache-clear-btn{position:fixed;top:16px;right:16px;background:var(--green);color:#0f1419;border:none;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;z-index:99;transition:all .2s}
+.cache-clear-btn:hover{opacity:.8;transform:scale(1.05)}
 @media(max-width:640px){.greeting-title{font-size:36px}.metric-card{padding:20px;min-height:140px}.metric-value{font-size:32px}.action-buttons{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
+
+<button class="cache-clear-btn" onclick="clearCache()">🔄 Clear Cache</button>
 
 <div class="container">
 <div class="greeting-section">
@@ -336,6 +341,24 @@ body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
 </div>
 
 <script>
+// Register Service Worker for automatic cache busting
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/Trading-Dashboard/sw.js').then(reg => {
+    console.log('✓ Service Worker registered');
+    // Check for updates every 30 seconds
+    setInterval(() => reg.update(), 30000);
+  }).catch(err => console.log('Service Worker registration failed:', err));
+}
+
+// Force reload on page visibility change (when user comes back to tab)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    console.log('Page visible again, checking for updates...');
+    // Add cache-bust query parameter to force fresh load
+    location.href = location.href.split('?')[0] + '?v=' + Date.now();
+  }
+});
+
 const now = new Date();
 const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
 document.getElementById('dateLabel').textContent = now.toLocaleDateString('en-US',opts).toUpperCase();
@@ -345,6 +368,26 @@ function switchNav(tab) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(tab + '-tab').classList.add('active');
   event.target.closest('.nav-item').classList.add('active');
+}
+
+function clearCache() {
+  // Clear all caches
+  caches.keys().then(names => {
+    names.forEach(name => caches.delete(name));
+  });
+  
+  // Clear localStorage (if any)
+  localStorage.clear();
+  
+  // Show feedback and reload
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Cache cleared!';
+  btn.style.background = 'var(--green)';
+  
+  setTimeout(() => {
+    location.href = location.href.split('?')[0] + '?v=' + Date.now();
+  }, 800);
 }
 </script>
 
