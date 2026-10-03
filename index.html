@@ -11,7 +11,8 @@
 <!-- SUPABASE & OCR LIBRARIES -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0/+esm"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.7/dist/tesseract.min.js"></script>
-<script>window.SUPABASE_CONFIG = { url: '', key: '' };</script>
+<!-- ORBIT Supabase Integration -->
+<script src="./supabase-client.js" defer></script>
 <style>
 :root{--bg:#0f1419;--card:#1a2332;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--green:#2fd5a0;--red:#ff5468}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -593,7 +594,7 @@ function showExtractedData(data) {
   document.getElementById('extractedData').style.display = 'block';
 }
 
-function saveExtractedTrade() {
+async function saveExtractedTrade() {
   if (!lastExtractedData) return;
   
   // Calculate ROI
@@ -620,6 +621,31 @@ function saveExtractedTrade() {
   // Add to trades tab (after open positions)
   const tradesTab = document.getElementById('trades-tab');
   tradesTab.appendChild(tradeRow);
+  
+  // Try to save to Supabase if connected
+  if (window.orbitSupabase && window.orbitSupabase.getUserId()) {
+    const saved = await window.orbitSupabase.saveTradeToDatabase({
+      symbol: lastExtractedData.symbol,
+      position: lastExtractedData.position,
+      leverage: lastExtractedData.leverage,
+      entry: lastExtractedData.entry,
+      exit: lastExtractedData.exit,
+      current: lastExtractedData.exit,
+      margin: lastExtractedData.margin,
+      realCapital: lastExtractedData.margin,
+      size: lastExtractedData.margin * lastExtractedData.leverage,
+      notional: lastExtractedData.margin * lastExtractedData.leverage,
+      qty: lastExtractedData.qty,
+      pnl: lastExtractedData.pnl,
+      roi: roi
+    });
+    
+    if (saved) {
+      console.log('✅ Trade saved to Supabase:', saved.id);
+    } else {
+      console.log('⚠️ Trade added to UI but not saved to database');
+    }
+  }
   
   // Clear upload form
   document.getElementById('fileInput').value = '';
