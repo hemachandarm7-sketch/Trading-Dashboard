@@ -8,7 +8,9 @@
 <meta http-equiv="Expires" content="-1">
 <meta name="format-detection" content="telephone=no">
 <title>ORBIT - Trading Dashboard</title>
-<!-- SUPABASE CONFIG (to be added) -->
+<!-- SUPABASE & OCR LIBRARIES -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0/+esm"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.7/dist/tesseract.min.js"></script>
 <script>window.SUPABASE_CONFIG = { url: '', key: '' };</script>
 <style>
 :root{--bg:#0f1419;--card:#1a2332;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--green:#2fd5a0;--red:#ff5468}
@@ -306,15 +308,35 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Rob
 
 <!-- UPLOAD TAB -->
 <div id="upload-tab" class="tabs-container">
-<div style="text-align:center;padding:32px 16px;margin-bottom:20px">
-<div style="font-size:48px;margin-bottom:16px">☁️</div>
-<h3 style="font-size:16px;margin-bottom:8px;font-weight:600">Upload Screenshots</h3>
-<p style="color:var(--mut);font-size:13px;margin-bottom:20px;line-height:1.5">Drop CoinDCX trade screenshots to auto-extract data</p>
-<div style="background:var(--card);border:2px dashed var(--border);border-radius:12px;padding:32px 16px;cursor:pointer">
-<p style="color:var(--mut);font-size:14px;font-weight:500">Select or drag files here</p>
-<p style="color:var(--mut);font-size:12px;margin-top:8px">PNG, JPG, JPEG, WEBP (up to 10 MB)</p>
+<div style="margin-bottom:20px">
+<h3 style="font-size:16px;margin-bottom:14px;font-weight:600">📸 Upload Trade Screenshots</h3>
+
+<div style="background:var(--card);border:2px dashed var(--border);border-radius:12px;padding:28px;cursor:pointer;transition:all .2s;text-align:center" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="this.style.borderColor='var(--green)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="handleFileDrop(event)">
+<div style="font-size:40px;margin-bottom:12px">☁️</div>
+<p style="color:var(--tx);font-size:14px;font-weight:600;margin-bottom:4px">Drag CoinDCX screenshots here</p>
+<p style="color:var(--mut);font-size:12px;margin-bottom:12px">or click to browse</p>
+<p style="color:var(--mut);font-size:11px">PNG, JPG, JPEG, WEBP (max 10 MB) • Tesseract OCR processes locally</p>
 </div>
-<p style="color:var(--mut);font-size:12px;margin-top:16px">Browser OCR ready - images read locally with Tesseract</p>
+
+<input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+
+<div id="extractedData" style="display:none;margin-top:20px;background:rgba(47,213,160,.08);border:1px solid rgba(47,213,160,.3);border-radius:10px;padding:16px">
+<h4 style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--green)">✅ Extracted Trade Data</h4>
+<div id="dataPreview" style="font-size:12px;color:var(--tx)"></div>
+<button onclick="saveExtractedTrade()" style="margin-top:12px;padding:10px 14px;background:var(--green);color:#0f1419;border:none;border-radius:8px;cursor:pointer;font-weight:600;width:100%">➕ Add to Trades</button>
+</div>
+
+<div id="processingStatus" style="display:none;margin-top:16px;text-align:center">
+<div style="font-size:12px;color:var(--mut);margin-bottom:8px">Processing screenshot...</div>
+<div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
+<div id="progressBar" style="height:100%;background:var(--green);width:0;transition:width .3s"></div>
+</div>
+</div>
+
+<div style="margin-top:20px;padding:14px;background:rgba(255,84,104,.08);border:1px solid rgba(255,84,104,.2);border-radius:10px;display:none" id="errorMsg">
+<p style="font-size:12px;color:var(--red)">⚠️ <span id="errorText"></span></p>
+</div>
+
 </div>
 </div>
 
@@ -464,6 +486,156 @@ function switchNav(tab) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(tab + '-tab').classList.add('active');
   event.target.closest('.nav-item').classList.add('active');
+}
+
+// === OCR & SCREENSHOT PROCESSING ===
+let lastExtractedData = null;
+
+function handleFileDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const files = e.dataTransfer.files;
+  processFiles(files);
+}
+
+function handleFileSelect(e) {
+  const files = e.target.files;
+  processFiles(files);
+}
+
+async function processFiles(files) {
+  if (!files.length) return;
+  
+  const file = files[0]; // Process first file
+  
+  // Validate file
+  if (!file.type.startsWith('image/')) {
+    showError('Please upload an image file');
+    return;
+  }
+  
+  if (file.size > 10 * 1024 * 1024) {
+    showError('File too large (max 10 MB)');
+    return;
+  }
+  
+  // Show processing UI
+  document.getElementById('processingStatus').style.display = 'block';
+  document.getElementById('extractedData').style.display = 'none';
+  
+  try {
+    const text = await extractTextFromImage(file);
+    const data = parseTradeFromText(text);
+    lastExtractedData = data;
+    
+    showExtractedData(data);
+    document.getElementById('processingStatus').style.display = 'none';
+  } catch (err) {
+    showError('OCR failed: ' + err.message);
+    document.getElementById('processingStatus').style.display = 'none';
+  }
+}
+
+async function extractTextFromImage(file) {
+  const { createWorker } = window.Tesseract;
+  const worker = await createWorker('eng');
+  
+  try {
+    const result = await worker.recognize(file);
+    return result.data.text;
+  } finally {
+    await worker.terminate();
+  }
+}
+
+function parseTradeFromText(text) {
+  // Regex patterns for CoinDCX trade data
+  const patterns = {
+    symbol: /([A-Z]{2,}\s*\/\s*USDT)/i,
+    position: /(LONG|SHORT|Buy|Sell)/i,
+    leverage: /([0-9]+)\s*x(?:\s+leverage)?/i,
+    entry: /(?:entry|avg\s*entry|average\s*entry)[:\s]+([0-9.]+)/i,
+    exit: /(?:close|exit|current|ltp)[:\s]+([0-9.]+)/i,
+    margin: /(?:margin|capital|wallet)[:\s]+([0-9.]+)/i,
+    qty: /(?:quantity|qty|amount)[:\s]+([0-9.]+)/i,
+    pnl: /(?:p[&]?l|profit|loss)[:\s]+([+-]?[0-9.]+)/i,
+  };
+  
+  return {
+    symbol: text.match(patterns.symbol)?.[1]?.toUpperCase() || 'UNKNOWN/USDT',
+    position: text.match(patterns.position)?.[1]?.toUpperCase().includes('SHORT') ? 'SHORT' : 'LONG',
+    leverage: parseInt(text.match(patterns.leverage)?.[1]) || 10,
+    entry: parseFloat(text.match(patterns.entry)?.[1]) || 0,
+    exit: parseFloat(text.match(patterns.exit)?.[1]) || 0,
+    margin: parseFloat(text.match(patterns.margin)?.[1]) || 0,
+    qty: parseFloat(text.match(patterns.qty)?.[1]) || 0,
+    pnl: parseFloat(text.match(patterns.pnl)?.[1]) || 0,
+    rawText: text.substring(0, 500)
+  };
+}
+
+function showExtractedData(data) {
+  const preview = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+      <div><span style="color:var(--mut)">Symbol:</span> <strong>${data.symbol}</strong></div>
+      <div><span style="color:var(--mut)">Position:</span> <strong>${data.position}</strong></div>
+      <div><span style="color:var(--mut)">Leverage:</span> <strong>${data.leverage}x</strong></div>
+      <div><span style="color:var(--mut)">Entry:</span> <strong>${data.entry.toFixed(6)}</strong></div>
+      <div><span style="color:var(--mut)">Exit:</span> <strong>${data.exit.toFixed(6)}</strong></div>
+      <div><span style="color:var(--mut)">Margin:</span> <strong>$${data.margin.toFixed(2)}</strong></div>
+      <div><span style="color:var(--mut)">Qty:</span> <strong>${data.qty.toFixed(2)}</strong></div>
+      <div><span style="color:var(--mut)">P&L:</span> <strong style="color:${data.pnl >= 0 ? 'var(--green)' : 'var(--red)'}">${data.pnl >= 0 ? '+' : ''}$${data.pnl.toFixed(2)}</strong></div>
+    </div>
+    <p style="font-size:11px;color:var(--mut);margin-top:12px">⚠️ Please verify extracted data - manual corrections accepted</p>
+  `;
+  
+  document.getElementById('dataPreview').innerHTML = preview;
+  document.getElementById('extractedData').style.display = 'block';
+}
+
+function saveExtractedTrade() {
+  if (!lastExtractedData) return;
+  
+  // Calculate ROI
+  const roi = lastExtractedData.margin > 0 
+    ? ((lastExtractedData.pnl / lastExtractedData.margin) * 100).toFixed(2)
+    : 0;
+  
+  const tradeRow = document.createElement('div');
+  tradeRow.className = 'trade-row';
+  tradeRow.innerHTML = `
+    <div class="trade-field">
+      <div class="trade-field-label">Symbol</div>
+      <div class="trade-field-value">${lastExtractedData.symbol}</div>
+      <div class="trade-tag">${lastExtractedData.position} ${lastExtractedData.leverage}x</div>
+    </div>
+    <div class="trade-field">
+      <div class="trade-field-label">Entry / Exit</div>
+      <div class="trade-field-value">${lastExtractedData.entry.toFixed(6)} → ${lastExtractedData.exit.toFixed(6)}</div>
+      <div class="trade-field-label" style="margin-top:8px">P&L</div>
+      <div class="trade-field-value ${lastExtractedData.pnl >= 0 ? 'gain' : 'loss'}">${lastExtractedData.pnl >= 0 ? '+' : ''}$${lastExtractedData.pnl.toFixed(2)} (${roi}%)</div>
+    </div>
+  `;
+  
+  // Add to trades tab (after open positions)
+  const tradesTab = document.getElementById('trades-tab');
+  tradesTab.appendChild(tradeRow);
+  
+  // Clear upload form
+  document.getElementById('fileInput').value = '';
+  document.getElementById('extractedData').style.display = 'none';
+  lastExtractedData = null;
+  
+  // Show success
+  showExtractedData({symbol:'✅ Added!',position:'Check Trades tab',leverage:'-',entry:0,exit:0,margin:0,qty:0,pnl:0});
+}
+
+function showError(msg) {
+  document.getElementById('errorText').textContent = msg;
+  document.getElementById('errorMsg').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('errorMsg').style.display = 'none';
+  }, 3000);
 }
 
 // === AGGRESSIVE CACHE CLEAR ===
