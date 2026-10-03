@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<meta http-equiv="Expires" content="-1">
+<meta name="format-detection" content="telephone=no">
 <title>ORBIT - Trading Dashboard</title>
+<!-- SUPABASE CONFIG (to be added) -->
+<script>window.SUPABASE_CONFIG = { url: '', key: '' };</script>
 <style>
 :root{--bg:#0f1419;--card:#1a2332;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--green:#2fd5a0;--red:#ff5468}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -422,23 +425,40 @@ body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Rob
 </div>
 
 <script>
+// === SERVICE WORKER REGISTRATION ===
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Trading-Dashboard/sw.js').then(reg => {
-    console.log('✓ Service Worker registered');
-    setInterval(() => reg.update(), 30000);
-  }).catch(err => console.log('Service Worker registration failed:', err));
+  navigator.serviceWorker.register('/Trading-Dashboard/sw.js?v=' + Date.now())
+    .then(reg => {
+      console.log('✅ Service Worker registered');
+      // Check for updates every 30 seconds
+      setInterval(() => {
+        reg.update().catch(e => console.log('Update check failed:', e));
+      }, 30000);
+      // Listen for SW messages
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.type === 'SW_CACHE_CLEARED') {
+          console.log('🔄 SW cleared caches:', event.data.message);
+        }
+      });
+    })
+    .catch(err => console.error('❌ SW registration failed:', err));
 }
 
+// === TAB VISIBILITY (force refresh when returning) ===
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    location.href = location.href.split('?')[0] + '?v=' + Date.now();
+    const v = 'v' + Math.random().toString(36).substr(2, 9);
+    console.log('📱 Tab visible - forcing refresh:', v);
+    location.href = location.href.split('?')[0] + '?' + v;
   }
 });
 
+// === DATE LABEL ===
 const now = new Date();
 const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
 document.getElementById('dateLabel').textContent = now.toLocaleDateString('en-US',opts).toUpperCase();
 
+// === NAVIGATION ===
 function switchNav(tab) {
   document.querySelectorAll('.tabs-container').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -446,16 +466,52 @@ function switchNav(tab) {
   event.target.closest('.nav-item').classList.add('active');
 }
 
-function clearCache() {
-  caches.keys().then(names => {
-    names.forEach(name => caches.delete(name));
-  });
-  localStorage.clear();
+// === AGGRESSIVE CACHE CLEAR ===
+async function clearCache() {
   const btn = event.target;
-  btn.textContent = '✓ Cleared!';
-  setTimeout(() => {
-    location.href = location.href.split('?')[0] + '?v=' + Date.now();
-  }, 600);
+  btn.textContent = '⏳ Clearing...';
+  btn.disabled = true;
+  
+  try {
+    // 1. Delete all caches
+    const cacheNames = await caches.keys();
+    console.log('Deleting caches:', cacheNames);
+    await Promise.all(cacheNames.map(name => caches.delete(name)));
+    
+    // 2. Clear localStorage & sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // 3. Tell SW to clear too
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'CLEAR_ALL_CACHES'
+      });
+    }
+    
+    // 4. Unregister SW temporarily
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (let reg of registrations) {
+      await reg.unregister();
+    }
+    
+    btn.textContent = '✅ Cleared!';
+    console.log('✅ Full cache clear complete');
+    
+    // 5. Hard refresh with unique ID
+    setTimeout(() => {
+      const uniqueId = Math.random().toString(36).substr(2, 16);
+      window.location.href = location.pathname + '?nocache=' + uniqueId;
+      // Also force browser cache clear
+      if ('caches' in window) {
+        caches.keys().then(names => names.forEach(n => caches.delete(n)));
+      }
+    }, 800);
+  } catch (err) {
+    console.error('❌ Clear cache error:', err);
+    btn.textContent = '❌ Error!';
+    btn.disabled = false;
+  }
 }
 </script>
 
