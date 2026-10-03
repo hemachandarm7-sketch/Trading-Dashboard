@@ -7,234 +7,201 @@
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <title>ORBIT - Trading Dashboard</title>
 <style>
-:root{--bg-dark:#0a0e27;--bg-light:#0f172a;--card:#1a2847;--card-hover:#243558;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--g:#2fd5a0;--r:#ff5468;--y:#fca311;--b:#3f8aff;--p:#8a2be2;--grad1:#2a5f9e;--grad2:#1a3a5c}
+:root{--bg:#0f1419;--card:#1a2332;--border:#2c3e5f;--tx:#e4e6eb;--mut:#8b92a9;--green:#2fd5a0;--red:#ff5468}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--tx);background:radial-gradient(ellipse 150% 100% at 50% 0%,var(--grad1),var(--bg-dark) 60%),linear-gradient(to bottom,var(--bg-dark),var(--bg-light));min-height:100vh;padding:0;position:relative}
-body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 15% 80%,rgba(47,213,160,.05),transparent 50%),radial-gradient(circle at 85% 20%,rgba(63,138,255,.05),transparent 50%);pointer-events:none;z-index:0}
-.container{position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:16px}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-.logo{font-size:28px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,var(--g),var(--b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.header-right{display:flex;gap:12px;align-items:center}
-.timestamp{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:6px}.dot{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.4}}
-.refresh{background:linear-gradient(135deg,rgba(47,213,160,.1),rgba(63,138,255,.1));border:1px solid var(--border);color:var(--tx);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
-.refresh:hover{background:linear-gradient(135deg,rgba(47,213,160,.2),rgba(63,138,255,.2));border-color:var(--g)}
-.greeting{margin-bottom:32px}
-.greeting-date{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.greeting-title{font-size:40px;font-weight:700;color:var(--tx);margin-bottom:4px;line-height:1.2}
-.greeting-sub{font-size:14px;color:var(--mut)}
-.tabs{display:flex;gap:24px;margin-bottom:32px;border-bottom:1px solid var(--border);overflow-x:auto;padding-bottom:0}
-.tab{padding:12px 0;cursor:pointer;color:var(--mut);font-size:14px;font-weight:500;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
-.tab:hover{color:var(--tx)}
-.tab.active{color:var(--g);border-color:var(--g)}
-.section{display:none}
-.section.active{display:block}
-.grid{display:grid;gap:16px;margin-bottom:24px}
-.grid.cols2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.grid.cols3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
-.grid.cols6{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.metric{background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6));border:1px solid var(--border);border-radius:14px;padding:24px;transition:all .3s;position:relative;overflow:hidden}
-.metric::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(47,213,160,.02),rgba(63,138,255,.02));pointer-events:none}
-.metric:hover{border-color:var(--g);background:linear-gradient(135deg,rgba(26,40,71,.9),rgba(36,53,88,.7));transform:translateY(-2px)}
-.metric-content{position:relative;z-index:1}
-.metric-icon{font-size:28px;margin-bottom:12px;opacity:.8}
-.metric small{display:block;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.metric b{display:block;font-size:32px;font-weight:700;margin:8px 0;letter-spacing:-.5px}
-.metric.up b{background:linear-gradient(135deg,var(--g),#1dd5a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.metric.dn b{background:linear-gradient(135deg,var(--r),#ff3a50);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.metric .sub{color:var(--mut);font-size:12px;margin-top:8px}
-.section-title{font-size:18px;font-weight:600;margin-bottom:20px;color:var(--tx);letter-spacing:-.5px}
-.chart-container{background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6));border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px}
-.chart-container h3{font-size:12px;color:var(--mut);text-transform:uppercase;margin-bottom:16px;font-weight:500}
-.mini-list{background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6));border:1px solid var(--border);border-radius:14px;padding:16px}
-.mini-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border)}
-.mini-row:last-child{border:0}
-.mini-row .label{display:flex;flex-direction:column;gap:4px}
-.mini-row .label b{font-size:13px;color:var(--tx);font-weight:600}
-.mini-row .label small{font-size:11px;color:var(--mut)}
-.mini-row .value{text-align:right;font-weight:600;font-size:14px;letter-spacing:-.3px}
-.mini-row .value.up{color:var(--g)}
-.mini-row .value.dn{color:var(--r)}
-.coin-bar{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(36,53,88,.5);border-radius:10px;margin-bottom:10px;border:1px solid var(--border);transition:all .2s}
-.coin-bar:hover{background:rgba(36,53,88,.7);border-color:var(--g)}
-.coin-bar .icon{width:36px;height:36px;background:linear-gradient(135deg,var(--b),var(--p));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
-.coin-bar .name{flex:0 0 110px;font-weight:600;font-size:13px}
-.coin-bar .bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:80px}
-.coin-bar .bar span{display:block;height:100%;border-radius:3px}
-.coin-bar .value{flex:0 0 70px;text-align:right;font-weight:600;font-size:13px;letter-spacing:-.3px}
-.coin-bar .value.dn{color:var(--r)}
-.trade-row{background:linear-gradient(135deg,rgba(26,40,71,.7),rgba(36,53,88,.5));border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;display:grid;gap:16px;transition:all .2s}
-.trade-row:hover{border-color:var(--g);background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6))}
-.trade-row .field{display:flex;flex-direction:column;gap:6px}
-.trade-row .field small{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-.trade-row .field b{color:var(--tx);font-size:13px;font-weight:600}
-.trade-row .field .tag{display:inline-block;width:fit-content;background:linear-gradient(135deg,var(--g),#1dd5a0);color:var(--bg-dark);padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;margin-top:4px}
-.trade-row .field .tag.loss{background:linear-gradient(135deg,var(--r),#ff3a50)}
-@media(max-width:1024px){.grid.cols3,.grid.cols6{grid-template-columns:repeat(2,1fr)}.greeting-title{font-size:28px}.trade-row{grid-template-columns:1fr}}
-@media(max-width:640px){.grid,.grid.cols2,.grid.cols3,.grid.cols6{grid-template-columns:1fr}.header{flex-direction:column;gap:12px;align-items:flex-start}.tabs{gap:12px;font-size:12px}.greeting-title{font-size:24px}.metric{padding:16px}.metric b{font-size:24px}.container{padding:12px}}
-.exit-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.exit-item{background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6));border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
-.exit-item .num{font-size:28px;font-weight:700;color:var(--g);margin-bottom:4px}
-.exit-item .label{font-size:12px;color:var(--mut);text-transform:uppercase;font-weight:500}
-.search-box{background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6));border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px}
-.search-box input{background:transparent;border:0;color:var(--tx);width:100%;font-size:13px}
-.search-box input::placeholder{color:var(--mut)}
-.badges{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-.badge{background:rgba(44,62,95,.6);border:1px solid var(--border);color:var(--tx);padding:8px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s;font-weight:500}
-.badge:hover{border-color:var(--g)}
-.badge.active{background:linear-gradient(135deg,var(--g),#1dd5a0);color:var(--bg-dark);border-color:var(--g)}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:var(--bg);color:var(--tx);padding-bottom:80px;overflow-x:hidden}
+.container{max-width:800px;margin:0 auto;padding:16px}
+.greeting-section{margin-bottom:24px}
+.date-label{font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
+.greeting-title{font-size:40px;font-weight:700;margin-bottom:8px;line-height:1.1}
+.greeting-sub{font-size:14px;color:var(--mut);margin-bottom:24px}
+.action-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+.btn{padding:16px;border-radius:12px;border:1px solid var(--border);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-time{background:transparent;color:var(--tx);display:flex;align-items:center;gap:8px;justify-content:center}
+.btn-time:hover{background:var(--card);border-color:var(--green)}
+.btn-add{background:var(--green);color:#0f1419;font-weight:600;border:0;display:flex;align-items:center;gap:8px;justify-content:center}
+.btn-add:hover{opacity:.9;transform:scale(1.02)}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;transition:all .2s}
+.metric-card:hover{border-color:var(--green);background:#232d3a}
+.metric-icon{position:absolute;top:16px;right:16px;width:48px;height:48px;background:rgba(47,213,160,.1);border:1px solid rgba(47,213,160,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--green)}
+.metric-label{font-size:13px;color:var(--mut);text-transform:capitalize;margin-bottom:8px}
+.metric-value{font-size:36px;font-weight:700;margin-bottom:8px;letter-spacing:-.5px}
+.metric-sub{font-size:12px;color:var(--mut)}
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:8px;z-index:100}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 0;cursor:pointer;color:var(--mut);font-size:11px;text-align:center;gap:4px;transition:all .2s;text-decoration:none}
+.nav-item.active{color:var(--green)}
+.nav-item icon{font-size:20px}
+.tabs-container{display:none}
+.tabs-container.active{display:block}
+@media(max-width:640px){.greeting-title{font-size:28px}.metric-card{padding:20px}.metric-value{font-size:28px}.metric-icon{width:40px;height:40px;font-size:20px}}
 </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<div class="logo">◉ ORBIT</div>
-<div class="header-right">
-<span class="timestamp"><span class="dot"></span><span id="time">--:--:--</span></span>
-<button class="refresh" onclick="location.reload()">🔄 Refresh</button>
-</div>
-</div>
 
-<div class="greeting">
-<div class="greeting-date" id="dateDisplay">--</div>
+<div class="container">
+<div class="greeting-section">
+<div class="date-label" id="dateLabel">--</div>
 <div class="greeting-title">Good morning, trader</div>
 <div class="greeting-sub">Your database-backed trading journal at a glance.</div>
 </div>
 
-<div class="tabs">
-<div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
-<div class="tab" onclick="switchTab('trades')">📋 Trades</div>
-<div class="tab" onclick="switchTab('analytics')">📈 Analytics</div>
+<div class="action-buttons">
+<button class="btn btn-time">📅 All time</button>
+<button class="btn btn-add">+ Add trade</button>
 </div>
 
-<!-- DASHBOARD SECTION -->
-<div id="dashboard" class="section active">
-<div class="grid cols6">
-<div class="metric up"><div class="metric-content"><div class="metric-icon">📊</div><small>Total Trades</small><b id="totalTrades">9</b><span class="sub">5 closed · 4 open</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">📈</div><small>Open Positions</small><b id="openCount">5</b><span class="sub">Active exposure</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">✓</div><small>Closed Trades</small><b id="closedCount">5</b><span class="sub">Completed</span></div></div>
-<div class="metric up"><div class="metric-content"><div class="metric-icon">💼</div><small>Total Investment</small><b id="totalInv">186.78</b><span class="sub">Capital deployed</span></div></div>
-<div class="metric up"><div class="metric-content"><div class="metric-icon">📈</div><small>Realized P&L</small><b id="realizedPnl">+76.53</b><span class="sub">Closed trades</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">%</div><small>Win Rate</small><b id="winRate">40%</b><span class="sub">2 wins / 5</span></div></div>
+<div id="dashboard-tab" class="tabs-container active">
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-icon">📊</div>
+<div class="metric-label">Total trades</div>
+<div class="metric-value" id="totalTrades">9</div>
+<div class="metric-sub">From saved trade records</div>
 </div>
 
-<div class="section-title">Open Positions</div>
-<div id="openPositions" class="mini-list"></div>
-
-<div class="section-title">Performance by Coin</div>
-<div id="coinPerformance" style="background:linear-gradient(135deg,rgba(26,40,71,.8),rgba(36,53,88,.6));border:1px solid var(--border);border-radius:14px;padding:20px"></div>
-
-<div class="section-title">Performance Metrics</div>
-<div class="grid cols3">
-<div class="chart-container"><h3>Weekly P&L</h3><div style="height:100px;display:flex;align-items:flex-end;gap:6px;justify-content:space-around"><div style="width:20px;height:60%;background:linear-gradient(to top,var(--g),rgba(47,213,160,.5));border-radius:4px"></div><div style="width:20px;height:40%;background:linear-gradient(to top,var(--g),rgba(47,213,160,.5));border-radius:4px"></div></div></div>
-<div class="chart-container"><h3>Monthly P&L</h3><div style="height:100px;background:linear-gradient(to top,var(--g),rgba(47,213,160,.2));border-radius:4px"></div></div>
-<div class="chart-container"><h3>Equity Curve</h3><div style="height:100px;background:linear-gradient(90deg,transparent,var(--g));border-radius:4px;opacity:.5"></div></div>
-</div>
+<div class="metric-card">
+<div class="metric-icon">📈</div>
+<div class="metric-label">Open positions</div>
+<div class="metric-value" id="openPos">5</div>
+<div class="metric-sub">From saved trade records</div>
 </div>
 
-<!-- TRADES SECTION -->
-<div id="trades" class="section">
-<div class="search-box">
-<input type="text" id="searchTrade" placeholder="Search symbol, setup, exchange..." onkeyup="filterTrades()">
-</div>
-<div class="badges">
-<span class="badge active" onclick="setTradeFilter('all')">All Trades</span>
-<span class="badge" onclick="setTradeFilter('win')">✓ Wins</span>
-<span class="badge" onclick="setTradeFilter('loss')">✕ Losses</span>
-<span class="badge" onclick="setTradeFilter('open')">Open</span>
-</div>
-<div id="tradesList"></div>
+<div class="metric-card">
+<div class="metric-icon">✓</div>
+<div class="metric-label">Closed trades</div>
+<div class="metric-value" id="closedTrades">5</div>
+<div class="metric-sub">From saved trade records</div>
 </div>
 
-<!-- ANALYTICS SECTION -->
-<div id="analytics" class="section">
-<div class="grid cols6">
-<div class="metric"><div class="metric-content"><div class="metric-icon">📊</div><small>Total P&L</small><b class="up">+76.53</b><span class="sub">All realized P&L</span></div></div>
-<div class="metric up"><div class="metric-content"><div class="metric-icon">💰</div><small>Total Profit</small><b id="totalProfit">+92.13</b><span class="sub">Winning trades</span></div></div>
-<div class="metric dn"><div class="metric-content"><div class="metric-icon">📉</div><small>Total Loss</small><b id="totalLoss">-15.60</b><span class="sub">Losing trades</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">📈</div><small>Profit Factor</small><b id="profitFactor">5.91</b><span class="sub">Win/Loss ratio</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">%</div><small>Loss Rate</small><b id="lossRate">60%</b><span class="sub">3 losses</span></div></div>
-<div class="metric dn"><div class="metric-content"><div class="metric-icon">📊</div><small>Max Drawdown</small><b id="maxDD">-15.60</b><span class="sub">Peak to trough</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">💵</div><small>Avg Profit</small><b id="avgProfit">46.06</b><span class="sub">Per win</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">💸</div><small>Avg Loss</small><b id="avgLoss">5.20</b><span class="sub">Per loss</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">⏱️</div><small>Avg Holding</small><b id="avgHold">1d 14h</b><span class="sub">Trade duration</span></div></div>
-<div class="metric"><div class="metric-content"><div class="metric-icon">%</div><small>Avg P&L %</small><b class="up">+94.08%</b><span class="sub">ROI average</span></div></div>
+<div class="metric-card">
+<div class="metric-icon">💼</div>
+<div class="metric-label">Total investment</div>
+<div class="metric-value" id="totalInvest">$186.78</div>
+<div class="metric-sub">From saved trade records</div>
 </div>
 
-<div class="section-title">Exit Outcomes</div>
-<div class="exit-breakdown">
-<div class="exit-item"><div class="num" id="tpHit">5</div><div class="label">TP Hit</div></div>
-<div class="exit-item"><div class="num" id="slHit">0</div><div class="label">SL Hit</div></div>
-<div class="exit-item"><div class="num" id="manual">0</div><div class="label">Manual Close</div></div>
+<div class="metric-card">
+<div class="metric-icon">📈</div>
+<div class="metric-label">Realized P&L</div>
+<div class="metric-value" id="realizedPnl">+$76.53</div>
+<div class="metric-sub">From saved trade records</div>
+</div>
+
+<div class="metric-card">
+<div class="metric-icon">📊</div>
+<div class="metric-label">Unrealized P&L</div>
+<div class="metric-value" id="unrealizedPnl">—</div>
+<div class="metric-sub">Connect a verified market price feed</div>
+</div>
+
+<div class="metric-card">
+<div class="metric-icon">🛡️</div>
+<div class="metric-label">Win rate</div>
+<div class="metric-value" id="winRate">40.0%</div>
+<div class="metric-sub">From saved trade records</div>
+</div>
+
+<div class="metric-card">
+<div class="metric-icon">📊</div>
+<div class="metric-label">Average P&L</div>
+<div class="metric-value" id="avgPnl">$15.31</div>
+<div class="metric-sub">From saved trade records</div>
+</div>
+
+<div class="metric-card">
+<div class="metric-icon">⏱️</div>
+<div class="metric-label">Today's P&L</div>
+<div class="metric-value">$0.00</div>
+<div class="metric-sub">Known, realized P&L today</div>
+</div>
+
+<div class="metric-card">
+<div class="metric-icon">📅</div>
+<div class="metric-label">Monthly P&L</div>
+<div class="metric-value">$0.00</div>
+<div class="metric-sub">Known, realized P&L this month</div>
+</div>
 </div>
 </div>
 
+<div id="trades-tab" class="tabs-container">
+<div style="padding:40px 20px;text-align:center;color:var(--mut)">Trades content coming soon...</div>
+</div>
+
+<div id="upload-tab" class="tabs-container">
+<div style="padding:40px 20px;text-align:center;color:var(--mut)">Upload content coming soon...</div>
+</div>
+
+<div id="analytics-tab" class="tabs-container">
+<div style="padding:40px 20px;text-align:center;color:var(--mut)">Analytics content coming soon...</div>
+</div>
+
+<div id="settings-tab" class="tabs-container">
+<div style="padding:40px 20px;text-align:center;color:var(--mut)">Settings content coming soon...</div>
+</div>
+</div>
+
+<div class="nav-bar">
+<a class="nav-item active" onclick="switchNav('dashboard')">🏠<br>Dashboard</a>
+<a class="nav-item" onclick="switchNav('trades')">📊<br>Trades</a>
+<a class="nav-item" onclick="switchNav('upload')">☁️<br>Upload</a>
+<a class="nav-item" onclick="switchNav('analytics')">📈<br>Analytics</a>
+<a class="nav-item" onclick="switchNav('settings')">⚙️<br>Settings</a>
 </div>
 
 <script>
 const closedTrades = [
-  {symbol:'RARE/USDT #1',position:'SHORT',leverage:10,entry:0.02270,exit:0.01795,realCapital:18.31,notional:183.10,qty:8073,pnl:38.261,roi:209.00,status:'WIN',openTime:'28/09 04:44',closeTime:'30/09 01:50',duration:'1d 21h',date:'2026-09-30'},
-  {symbol:'INX/USDT',position:'LONG',leverage:10,entry:0.5742,exit:0.7360,realCapital:25.00,notional:250.00,qty:333,pnl:53.866,roi:215.41,status:'WIN',openTime:'23/09 01:08',closeTime:'27/09 22:48',duration:'4d 21h',date:'2026-09-27'},
-  {symbol:'RARE/USDT #2',position:'SHORT',leverage:10,entry:0.02250,exit:0.02416,realCapital:13.487,notional:134.87,qty:5994,pnl:-9.939,roi:-73.71,status:'LOSS',openTime:'27/09 12:41',closeTime:'28/09 04:34',duration:'16h',date:'2026-09-28'},
-  {symbol:'WLD/USDT',position:'LONG',leverage:10,entry:0.56,exit:0.55,realCapital:11.02,notional:110.20,qty:197,pnl:-2.163,roi:-19.63,status:'LOSS',openTime:'28/09 01:51',closeTime:'28/09 03:06',duration:'1h 15m',date:'2026-09-28'},
-  {symbol:'ENA/USDT',position:'LONG',leverage:10,entry:0.29,exit:0.28,realCapital:12.43,notional:124.30,qty:428,pnl:-3.496,roi:-28.10,status:'LOSS',openTime:'28/09 01:38',closeTime:'28/09 03:06',duration:'1h 28m',date:'2026-09-28'}
+  {symbol:'RARE/USDT #1',position:'SHORT',leverage:10,entry:0.02270,exit:0.01795,realCapital:18.31,pnl:38.261,roi:209.00},
+  {symbol:'INX/USDT',position:'LONG',leverage:10,entry:0.5742,exit:0.7360,realCapital:25.00,pnl:53.866,roi:215.41},
+  {symbol:'RARE/USDT #2',position:'SHORT',leverage:10,entry:0.02250,exit:0.02416,realCapital:13.487,pnl:-9.939,roi:-73.71},
+  {symbol:'WLD/USDT',position:'LONG',leverage:10,entry:0.56,exit:0.55,realCapital:11.02,pnl:-2.163,roi:-19.63},
+  {symbol:'ENA/USDT',position:'LONG',leverage:10,entry:0.29,exit:0.28,realCapital:12.43,pnl:-3.496,roi:-28.10}
 ];
 
 const openTrades = [
-  {symbol:'RECALL/USDT',position:'LONG',leverage:10,entry:0.04714,current:0.04892,liqPrice:0.04322,target:0.08000,qty:6662,realMargin:30.821,size:325.905,pnl:11.885,roe:38.56,status:'OPEN',openTime:'30/09',date:'2026-09-30'},
-  {symbol:'STBL/USDT',position:'LONG',leverage:10,entry:0.02676,current:0.02652,liqPrice:0.02450,target:0.05300,qty:10103,realMargin:26.922,size:267.932,pnl:-2.420,roe:-8.99,status:'OPEN',openTime:'01/10',date:'2026-10-01'},
-  {symbol:'YB/USDT',position:'LONG',leverage:5,entry:0.08701,current:0.08536,liqPrice:0.0709,target:0.40000,qty:1208,realMargin:21.045,size:103.115,pnl:-1.993,roe:-9.47,status:'OPEN',openTime:'01/10 12:03',date:'2026-10-01'},
-  {symbol:'SIREN/USDT',position:'LONG',leverage:7,entry:0.02310,current:0.02317,liqPrice:0.02014,target:0.03000,qty:4652,realMargin:15.390,size:107.787,pnl:0.326,roe:2.12,status:'OPEN',openTime:'01/10 04:45',date:'2026-10-01'},
-  {symbol:'DEXE/USDT',position:'LONG',leverage:7,entry:2.075,current:2.076,liqPrice:1.809,target:2.400,qty:52.59,realMargin:15.628,size:109.177,pnl:0.053,roe:0.34,status:'OPEN',openTime:'02/10 02:13',date:'2026-10-02'}
+  {symbol:'RECALL/USDT',leverage:10,realMargin:30.821,pnl:11.885,roe:38.56},
+  {symbol:'STBL/USDT',leverage:10,realMargin:26.922,pnl:-2.420,roe:-8.99},
+  {symbol:'YB/USDT',leverage:5,realMargin:21.045,pnl:-1.993,roe:-9.47},
+  {symbol:'SIREN/USDT',leverage:7,realMargin:15.390,pnl:0.326,roe:2.12},
+  {symbol:'DEXE/USDT',leverage:7,realMargin:15.628,pnl:0.053,roe:0.34}
 ];
 
-let tradeFilter='all';
-const $=(id)=>document.getElementById(id);
-const cl=n=>n>=0?'up':'dn',f=(n,d=2)=>(n>=0?'+':'')+n.toFixed(d),sum=(a,k)=>a.reduce((s,t)=>s+t[k],0);
-setInterval(()=>$('time').textContent=new Date().toLocaleTimeString('en-GB'),1000);
-const now=new Date();$('dateDisplay').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+const $ = id => document.getElementById(id);
+const sum = (a,k) => a.reduce((s,t) => s+t[k], 0);
+const f = (n,d=2) => (n>=0?'+':'') + n.toFixed(d);
 
-const cP=sum(closedTrades,'pnl'),oP=sum(openTrades,'pnl'),tot=cP+oP,cap=sum(closedTrades,'realCapital')+sum(openTrades,'realMargin');
-const wins=closedTrades.filter(t=>t.pnl>0).length,losses=closedTrades.length-wins,wr=Math.round(wins/(closedTrades.length||1)*100);
-const profit=sum(closedTrades.filter(t=>t.pnl>0),'pnl'),loss=Math.abs(sum(closedTrades.filter(t=>t.pnl<0),'pnl'));
-const pf=loss>0?profit/loss:0,avgP=wins>0?profit/wins:0,avgL=losses>0?loss/losses:0;
+// Update date
+const now = new Date();
+const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
+$('dateLabel').textContent = now.toLocaleDateString('en-US',opts).toUpperCase();
 
-$('totalTrades').textContent=closedTrades.length+openTrades.length;
-$('openCount').textContent=openTrades.length;
-$('closedCount').textContent=closedTrades.length;
-$('totalInv').textContent=cap.toFixed(2);
-$('realizedPnl').textContent=f(cP);
-$('realizedPnl').parentElement.className='metric '+cl(cP);
-$('winRate').textContent=wr+'%';
-$('totalProfit').textContent=f(profit);
-$('totalLoss').textContent=f(-loss);
-$('lossRate').textContent=(Math.round(losses/(closedTrades.length||1)*100))+'%';
-$('avgProfit').textContent=avgP.toFixed(2);
-$('avgLoss').textContent=avgL.toFixed(2);
-$('maxDD').textContent=f(-loss);
-$('profitFactor').textContent=pf.toFixed(2);
-$('avgHold').textContent='1d 14h';
+// Calculate metrics
+const cP = sum(closedTrades, 'pnl');
+const oP = sum(openTrades, 'pnl');
+const cap = sum(closedTrades, 'realCapital') + sum(openTrades, 'realMargin');
+const wins = closedTrades.filter(t => t.pnl > 0).length;
+const wr = Math.round(wins / closedTrades.length * 100);
+const avgPnl = cP / closedTrades.length;
 
-$('openPositions').innerHTML=openTrades.map(t=>`<div class="mini-row"><div class="label"><b>${t.symbol}</b><small>${t.position} ${t.leverage}x · ${t.entry}</small></div><div class="value ${cl(t.pnl)}">${f(t.pnl)} <small style="display:block;font-size:11px">${f(t.roe,2)}%</small></div></div>`).join('');
+// Update dashboard
+$('totalTrades').textContent = closedTrades.length + openTrades.length;
+$('openPos').textContent = openTrades.length;
+$('closedTrades').textContent = closedTrades.length;
+$('totalInvest').textContent = '$' + cap.toFixed(2);
+$('realizedPnl').textContent = (cP >= 0 ? '+' : '') + '$' + cP.toFixed(2);
+$('unrealizedPnl').textContent = '—';
+$('winRate').textContent = wr.toFixed(1) + '%';
+$('avgPnl').textContent = '$' + avgPnl.toFixed(2);
 
-const coins={};closedTrades.forEach(t=>{if(!coins[t.symbol])coins[t.symbol]={pnl:0};coins[t.symbol].pnl+=t.pnl});
-const sortedCoins=Object.entries(coins).sort((a,b)=>b[1].pnl-a[1].pnl);
-const maxCoin=Math.max(...sortedCoins.map(c=>Math.abs(c[1].pnl)));
-$('coinPerformance').innerHTML=sortedCoins.map(([sym,d])=>{const w=Math.abs(d.pnl)/maxCoin*100;return `<div class="coin-bar"><div class="icon">${sym[0]}</div><div class="name">${sym}</div><div class="bar"><span style="width:${Math.max(5,w)}%;background:${d.pnl>=0?'var(--g)':'var(--r)'}"></span></div><div class="value ${cl(d.pnl)}">${f(d.pnl)}</div></div>`}).join('');
-
-$('tpHit').textContent=closedTrades.length;
-$('slHit').textContent='0';
-$('manual').textContent='0';
-
-function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));event.target.classList.add('active');$(tab).classList.add('active')}
-
-function setTradeFilter(f){tradeFilter=f;document.querySelectorAll('.badge').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderTrades()}
-
-function filterTrades(){renderTrades()}
-
-function renderTrades(){const q=$('searchTrade').value.toLowerCase();let trades=closedTrades.map(t=>({...t,type:'closed'}));if(tradeFilter==='open'||tradeFilter==='all')trades=[...trades,...openTrades.map(t=>({...t,type:'open'}))];if(tradeFilter==='win')trades=trades.filter(t=>t.pnl>0);if(tradeFilter==='loss')trades=trades.filter(t=>t.pnl<0);if(tradeFilter==='open')trades=trades.filter(t=>t.type==='open');trades=trades.filter(t=>t.symbol.toLowerCase().includes(q));$('tradesList').innerHTML=trades.length?trades.map(t=>`<div class="trade-row"><div class="field"><small>Symbol</small><b>${t.symbol}</b><span class="tag ${t.pnl>=0?'':'loss'}">${t.position} ${t.leverage}x</span></div><div class="field"><small>Entry / Exit</small><b>${t.entry}${t.type==='closed'?` → ${t.exit}`:` / ${t.current||'N/A'}`}</b></div><div class="field"><small>P&L</small><b class="${cl(t.pnl)}">${f(t.pnl)}</b><small class="${cl(t.roi||t.roe)}">${f(t.roi||t.roe,2)}% ROI</small></div></div>`).join(''):`<div style="text-align:center;padding:40px;color:var(--mut)">No trades found</div>`}
-
-renderTrades();
+function switchNav(tab) {
+  document.querySelectorAll('.tabs-container').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  $(tab + '-tab').classList.add('active');
+  event.target.closest('.nav-item').classList.add('active');
+}
 </script>
+
 </body>
 </html>
